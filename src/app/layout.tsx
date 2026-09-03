@@ -17,30 +17,35 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://mis-xv-maria.vercel.app"),
-  title: "Mis XV años - María",
-  description: "Estás cordialmente invitado a celebrar los XV años de María. Sábado 3 de octubre en Cholas.",
+  metadataBase: new URL("https://cumplea-os-sas.vercel.app"),
+  title: "👑 Mis XV Años — María José Villegas",
+  description: "Acompáñame a celebrar mis 15 años este Sábado 3 de Octubre. Por favor confirma tu asistencia aquí 💜",
   openGraph: {
-    title: "Mis XV años - María",
-    description: "Te invito a celebrar mis XV años. Confirma tu asistencia.",
-    url: "https://mis-xv-maria.vercel.app",
-    siteName: "Mis XV años - María",
-    locale: "es_ES",
-    type: "website",
+    title: "👑 Mis XV Años — María José Villegas",
+    description: "Acompáñame a celebrar mis 15 años este Sábado 3 de Octubre. Confirma tu asistencia aquí 💜",
+    url: "https://cumplea-os-sas.vercel.app",
+    siteName: "XV Años María José",
     images: [
       {
         url: "/maria.jpg",
         width: 800,
-        height: 1000,
-        alt: "Fotografía de María - XV Años",
+        height: 1200,
+        alt: "María José Villegas - Mis XV Años",
       },
     ],
+    locale: "es_CO",
+    type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mis XV años - María",
-    description: "Te invito a celebrar mis XV años. Confirma tu asistencia.",
+    title: "👑 Mis XV Años — María José Villegas",
+    description: "Acompáñame a celebrar mis 15 años. Confirma tu asistencia aquí 💜",
     images: ["/maria.jpg"],
+  },
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
   },
 };
 
