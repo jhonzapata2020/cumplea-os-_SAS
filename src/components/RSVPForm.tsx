@@ -7,7 +7,7 @@ import { submitRSVP } from '@/lib/supabase';
 
 interface RSVPFormProps {
   eventId: string;
-  onSuccess: (result: RSVPResult) => void;
+  onSuccess: (result: RSVPResult, guestName: string, guestCount: number) => void;
 }
 
 export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
@@ -65,7 +65,7 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
       const result = await submitRSVP(eventId, formData);
 
       if (result.success) {
-        onSuccess(result);
+        onSuccess(result, fullName.trim(), attending ? guestCount : 1);
       } else {
         setErrorMsg(result.message);
       }

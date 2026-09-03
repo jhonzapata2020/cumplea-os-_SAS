@@ -9,7 +9,7 @@ export const DEFAULT_MARIA_EVENT: Event = {
   id: '00000000-0000-0000-0000-000000000001',
   slug: 'maria',
   title: 'Mis XV años',
-  celebrant_name: 'María',
+  celebrant_name: 'María José',
   event_date: '2026-10-03T19:30:00-05:00',
   location_name: 'Cholas',
   location_details: 'Segundo piso',

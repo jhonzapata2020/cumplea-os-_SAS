@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Calendar, Clock, MapPin, ExternalLink } from 'lucide-react';
+import { Calendar, Clock, MapPin, ExternalLink, Gift, Sparkles, Shirt } from 'lucide-react';
 import { Event } from '@/types/database';
 
 interface EventDetailsProps {
@@ -60,15 +60,47 @@ export const EventDetails: React.FC<EventDetailsProps> = ({ event }) => {
             )}
           </div>
         </div>
+
+        {/* TARJETA: CÓDIGO DE VESTIMENTA (DRESS CODE) */}
+        <div className="p-5 rounded-2xl bg-gradient-to-b from-white/80 to-rose-blush/40 backdrop-blur-md border border-white/90 shadow-glass text-left">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-lg bg-lavender-100 flex items-center justify-center text-lavender-700 border border-gold/20">
+              <Shirt className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-plum font-heading">Código de Vestimenta</h4>
+              <p className="text-xs text-lavender-700 font-medium">Formal / Traje de Cóctel</p>
+            </div>
+          </div>
+          <p className="text-xs text-plum/80 font-light leading-relaxed mt-2 pt-2 border-t border-gold/20">
+            ✨ <span className="font-medium text-plum">Nota especial:</span> Agradecemos reservar los tonos <span className="font-semibold text-lavender-700">lila y lavanda</span> exclusivamente para la quinceañera.
+          </p>
+        </div>
+
+        {/* TARJETA: LLUVIA DE SOBRES */}
+        <div className="p-5 rounded-2xl bg-gradient-to-b from-white/80 to-lavender-50/60 backdrop-blur-md border border-white/90 shadow-glass text-left">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-lg bg-rose-blush flex items-center justify-center text-rose-accent border border-gold/20">
+              <Gift className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-plum font-heading">Lluvia de Sobres</h4>
+              <p className="text-xs text-rose-accent font-medium">Regalo sugerido</p>
+            </div>
+          </div>
+          <p className="text-xs text-plum/80 font-light leading-relaxed mt-2 pt-2 border-t border-gold/20">
+            &ldquo;Tu presencia es mi mayor regalo. Si deseas hacerme un detalle, contaremos con lluvia de sobres en el salón.&rdquo;
+          </p>
+        </div>
       </div>
 
       {/* Botón Ver Ubicación */}
-      <div className="mt-5 text-center">
+      <div className="mt-6 text-center">
         <a
           href={mapsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-lavender-600 via-purple-600 to-lavender-700 text-white font-medium text-sm shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-gradient-to-r from-lavender-600 via-purple-600 to-lavender-700 text-white font-medium text-sm shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
         >
           <MapPin className="w-4 h-4 text-gold-accent" />
           <span>Ver ubicación en Google Maps</span>

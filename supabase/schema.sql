@@ -111,7 +111,7 @@ INSERT INTO public.events (slug, title, celebrant_name, event_date, location_nam
 VALUES (
   'maria',
   'Mis XV años',
-  'María',
+  'María José',
   '2026-10-03T19:30:00-05:00',
   'Cholas',
   'Segundo piso',

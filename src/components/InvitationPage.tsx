@@ -17,9 +17,13 @@ interface InvitationPageProps {
 export const InvitationPage: React.FC<InvitationPageProps> = ({ event }) => {
   const [submitted, setSubmitted] = useState(false);
   const [rsvpResult, setRsvpResult] = useState<RSVPResult | null>(null);
+  const [confirmedGuestName, setConfirmedGuestName] = useState<string>('Invitado Especial');
+  const [confirmedGuestCount, setConfirmedGuestCount] = useState<number>(1);
 
-  const handleRSVPSuccess = (result: RSVPResult) => {
+  const handleRSVPSuccess = (result: RSVPResult, guestName: string, guestCount: number) => {
     setRsvpResult(result);
+    setConfirmedGuestName(guestName);
+    setConfirmedGuestCount(guestCount);
     setSubmitted(true);
     // Desplazar suavemente hacia la vista de éxito
     window.scrollTo({ top: document.body.scrollHeight / 3, behavior: 'smooth' });
@@ -45,7 +49,7 @@ export const InvitationPage: React.FC<InvitationPageProps> = ({ event }) => {
       {/* Marco contenedor centrado para desktop (mobile-first a 390px, max-w-lg en escritorio) */}
       <div className="max-w-lg mx-auto min-h-screen flex flex-col shadow-2xl bg-white/40 backdrop-blur-sm border-x border-white/60">
         
-        {/* 1. Hero: Fotografía de María + MARÍA + Mis XV Años + Fecha */}
+        {/* 1. Hero: Fotografía de María José + MARÍA JOSÉ + Mis XV Años + Fecha + Botón scroll */}
         <Hero
           celebrantName={event.celebrant_name}
           title={event.title}
@@ -59,16 +63,18 @@ export const InvitationPage: React.FC<InvitationPageProps> = ({ event }) => {
         {/* 3. Mensaje Breve de Invitación ("Con cariño") */}
         <InvitationMessage />
 
-        {/* 4. Información del Evento ("El gran día") */}
+        {/* 4. Información del Evento ("El gran día", Lluvia de sobres, Dress Code, Google Maps) */}
         <EventDetails event={event} />
 
-        {/* 5. Formulario de Confirmación O Mensaje de Éxito */}
+        {/* 5. Formulario de Confirmación O Mensaje de Éxito con Credencial de Pase Digital */}
         {!submitted ? (
           <RSVPForm eventId={event.id} onSuccess={handleRSVPSuccess} />
         ) : (
           <SuccessMessage
             event={event}
             isUpdate={rsvpResult?.isUpdate}
+            guestName={confirmedGuestName}
+            guestCount={confirmedGuestCount}
             onReset={handleReset}
           />
         )}

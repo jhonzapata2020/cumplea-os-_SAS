@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Sparkles, Heart } from 'lucide-react';
+import { Sparkles, Heart, ChevronDown } from 'lucide-react';
 
 interface HeroProps {
   celebrantName: string;
@@ -27,19 +27,16 @@ export const Hero: React.FC<HeroProps> = ({
       <div className="absolute top-60 -right-10 w-48 h-48 bg-rose-blush opacity-40 rounded-full blur-2xl -z-10" />
 
       {/* Insignia superior sutil */}
-      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/70 backdrop-blur-md border border-gold/30 text-xs tracking-widest text-plum/80 uppercase font-medium shadow-sm mb-6 animate-fade-in">
+      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-amber-300/40 text-xs tracking-widest text-plum/80 uppercase font-medium shadow-sm mb-6 animate-fade-in">
         <Sparkles className="w-3.5 h-3.5 text-gold" />
         <span>Te invito a celebrar</span>
         <Sparkles className="w-3.5 h-3.5 text-gold" />
       </div>
 
-      {/* MARCO DE FOTOGRAFÍA PRINCIPAL DE MARÍA */}
+      {/* MARCO DE FOTOGRAFÍA PRINCIPAL DE MARÍA JOSÉ */}
       <div className="relative mb-6 group animate-fade-in-up">
-        {/* Anillo exterior de brillo dorado/lavanda */}
-        <div className="absolute -inset-1.5 rounded-[40px] bg-gradient-to-b from-gold via-lavender-300 to-gold/70 opacity-80 blur-[2px] group-hover:opacity-100 transition duration-500" />
-        
-        {/* Contenedor de la foto de María */}
-        <div className="relative w-64 h-80 sm:w-72 sm:h-96 rounded-[38px] overflow-hidden border-2 border-white/80 shadow-gold-glow bg-gradient-to-b from-lavender-100 to-rose-soft">
+        {/* Contenedor con borde fino y elegante (sin pastilla superpuesta "Mis 15 Años") */}
+        <div className="relative w-64 h-80 sm:w-72 sm:h-96 rounded-3xl overflow-hidden border border-amber-300/60 shadow-2xl shadow-purple-900/10 bg-gradient-to-b from-lavender-100 to-rose-soft">
           {!imageError ? (
             <Image
               src={photoUrl}
@@ -56,7 +53,7 @@ export const Hero: React.FC<HeroProps> = ({
                 <Heart className="w-8 h-8 text-lavender-500 fill-lavender-200" />
               </div>
               <p className="font-heading text-2xl text-plum font-semibold mb-1">{celebrantName}</p>
-              <p className="text-xs text-plum/70 font-light">Fotografía de María</p>
+              <p className="text-xs text-plum/70 font-light">Fotografía de María José</p>
               <span className="mt-3 text-[10px] text-plum/50 px-3 py-1 bg-white/60 rounded-md border border-gold/30">
                 Coloca la foto en /public/maria.jpg
               </span>
@@ -66,20 +63,15 @@ export const Hero: React.FC<HeroProps> = ({
           {/* Superposición sutil de degradado inferior para integración suave */}
           <div className="absolute inset-0 bg-gradient-to-t from-plum-dark/40 via-transparent to-transparent pointer-events-none" />
         </div>
-
-        {/* Detalle decorativo flotante de corona o destello */}
-        <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md px-4 py-1 rounded-full border border-gold/40 shadow-md flex items-center gap-1.5">
-          <span className="text-xs font-serif italic text-gold-dark font-medium">Mis 15 Años</span>
-        </div>
       </div>
 
-      {/* TEXTOS Y NOMBRES */}
-      <div className="space-y-2 mt-4 max-w-sm">
-        <h1 className="font-heading text-5xl sm:text-6xl text-plum tracking-wider font-normal uppercase drop-shadow-sm">
+      {/* TEXTOS Y NOMBRES DE MARÍA JOSÉ */}
+      <div className="space-y-2 mt-2 max-w-sm">
+        <h1 className="font-heading text-4xl sm:text-5xl text-plum tracking-wider font-normal uppercase drop-shadow-sm leading-tight">
           {celebrantName}
         </h1>
 
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex items-center justify-center gap-3 pt-1">
           <div className="h-[1px] w-8 bg-gradient-to-r from-transparent to-gold" />
           <h2 className="text-lg sm:text-xl font-heading italic text-lavender-700 tracking-wide">
             {title}
@@ -88,9 +80,20 @@ export const Hero: React.FC<HeroProps> = ({
         </div>
 
         {/* FECHA DESTACADA */}
-        <p className="text-base sm:text-lg font-light text-plum/90 tracking-widest pt-2 uppercase">
+        <p className="text-sm sm:text-base font-light text-plum/90 tracking-widest pt-1 uppercase">
           {formattedDate}
         </p>
+      </div>
+
+      {/* BOTÓN O ENLACE SUTIL PARA GUIAR EL SCROLL EN MÓVILES */}
+      <div className="mt-7">
+        <a
+          href="#rsvp"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/70 backdrop-blur-md border border-lavender-200 text-plum/80 text-xs font-medium tracking-wide shadow-sm hover:shadow-md hover:bg-white transition duration-300 group"
+        >
+          <span>Confirmar Asistencia</span>
+          <ChevronDown className="w-4 h-4 text-lavender-600 group-hover:translate-y-0.5 transition-transform duration-300" />
+        </a>
       </div>
     </section>
   );
