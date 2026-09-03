@@ -97,7 +97,7 @@ export const InvitationPage: React.FC<InvitationPageProps> = ({ event }) => {
         )}
 
         {/* Footer */}
-        <Footer />
+        <Footer showAdminExport={!submitted} />
       </div>
     </main>
   );

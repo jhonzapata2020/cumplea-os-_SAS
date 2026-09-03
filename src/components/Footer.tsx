@@ -4,7 +4,11 @@ import React, { useState } from 'react';
 import { Heart, FileText } from 'lucide-react';
 import { AdminExportModal } from './AdminExportModal';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  showAdminExport?: boolean;
+}
+
+export const Footer: React.FC<FooterProps> = ({ showAdminExport = true }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -18,16 +22,18 @@ export const Footer: React.FC = () => {
         3 de Octubre de 2026 · Celebración Especial
       </p>
 
-      {/* Acceso discreto para descargar lista de invitados en PDF */}
-      <div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 hover:bg-purple-100 border border-purple-200 text-[11px] text-purple-900 font-medium transition cursor-pointer opacity-80 hover:opacity-100"
-        >
-          <FileText className="w-3 h-3 text-purple-600" />
-          <span>👑 Lista de Invitados (PDF)</span>
-        </button>
-      </div>
+      {/* Acceso para descargar lista de invitados en PDF (solo visible antes de registrarse) */}
+      {showAdminExport && (
+        <div>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-purple-50 hover:bg-purple-100 border border-purple-200 text-xs text-purple-900 font-medium transition cursor-pointer shadow-xs hover:shadow-sm"
+          >
+            <FileText className="w-3.5 h-3.5 text-purple-600" />
+            <span>👑 Lista de Invitados (PDF)</span>
+          </button>
+        </div>
+      )}
 
       {/* Modal de descarga protegido por PIN */}
       <AdminExportModal
