@@ -26,14 +26,14 @@ export const Hero: React.FC<HeroProps> = ({
       <div className="absolute top-32 -left-12 w-44 h-44 bg-lavender-300 opacity-25 rounded-full blur-2xl -z-10 pointer-events-none" />
       <div className="absolute top-48 -right-12 w-44 h-44 bg-rose-blush opacity-30 rounded-full blur-2xl -z-10 pointer-events-none" />
 
-      {/* 1. PASTILLA SUPERIOR COMPACTA */}
-      <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/85 backdrop-blur-md border border-amber-300/40 text-[11px] tracking-widest text-plum/80 uppercase font-medium shadow-xs mb-3 animate-fade-in shrink-0">
-        <Sparkles className="w-3 h-3 text-gold" />
+      {/* 1. ANTETÍTULO EDITORIAL ELEGANTE (Sin pastilla o recuadro rígido) */}
+      <div className="inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-medium tracking-[0.3em] text-purple-900/70 uppercase mb-3 animate-fade-in shrink-0">
+        <Sparkles className="w-3.5 h-3.5 text-gold shrink-0 opacity-80" />
         <span>Te invito a celebrar</span>
-        <Sparkles className="w-3 h-3 text-gold" />
+        <Sparkles className="w-3.5 h-3.5 text-gold shrink-0 opacity-80" />
       </div>
 
-      {/* 2. MARCO FOTOGRÁFICO DE ALTO PROTAGONISMO (Ratio 3:4 o 4:5, max-w-[340px] en móvil) */}
+      {/* 2. MARCO FOTOGRÁFICO DE ALTO PROTAGONISMO (Ratio 4:5, max-w-[340px]) */}
       <div className="relative w-full max-w-[330px] xs:max-w-[340px] sm:max-w-xs aspect-[4/5] my-1 group animate-fade-in-up shrink-0">
         <div className="relative w-full h-full rounded-[2rem] overflow-hidden border border-amber-300/40 shadow-2xl shadow-purple-950/15 bg-gradient-to-b from-lavender-100 to-rose-soft">
           {!imageError ? (
@@ -61,25 +61,28 @@ export const Hero: React.FC<HeroProps> = ({
           )}
 
           {/* Superposición sutil de degradado inferior */}
-          <div className="absolute inset-0 bg-gradient-to-t from-plum-dark/35 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-purple-950/35 via-transparent to-transparent pointer-events-none" />
         </div>
       </div>
 
-      {/* 3. NOMBRES Y SUBTÍTULOS COMPACTOS */}
-      <div className="space-y-1 mt-2.5 max-w-sm shrink-0">
-        <h1 className="font-heading text-3xl sm:text-5xl text-plum tracking-wider font-normal uppercase leading-tight drop-shadow-xs">
+      {/* 3. JERARQUÍA TIPOGRÁFICA ESCALADA Y ARMONIOSA */}
+      <div className="space-y-1.5 mt-3 max-w-sm shrink-0">
+        {/* Nombre Principal en Serif Escala Ampliada */}
+        <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl text-purple-950 tracking-wider font-normal uppercase leading-tight drop-shadow-xs">
           {celebrantName}
         </h1>
 
-        <div className="flex items-center justify-center gap-2.5 pt-0.5">
-          <div className="h-[1px] w-6 bg-gradient-to-r from-transparent to-gold" />
-          <h2 className="text-base sm:text-lg font-heading italic text-lavender-700 tracking-wide">
+        {/* Subtítulo "Mis XV años" con líneas decorativas estilizadas */}
+        <div className="flex items-center justify-center gap-3 pt-0.5">
+          <div className="h-[1px] w-8 bg-gradient-to-r from-transparent via-purple-300 to-gold" />
+          <h2 className="text-lg sm:text-xl font-heading italic text-purple-700/90 tracking-wide font-serif">
             {title}
           </h2>
-          <div className="h-[1px] w-6 bg-gradient-to-l from-transparent to-gold" />
+          <div className="h-[1px] w-8 bg-gradient-to-l from-transparent via-purple-300 to-gold" />
         </div>
 
-        <p className="text-xs sm:text-sm font-light text-plum/80 tracking-widest uppercase pt-0.5">
+        {/* Fecha nítida y espaciada */}
+        <p className="text-xs sm:text-sm font-sans font-medium text-stone-500 tracking-[0.25em] uppercase pt-1">
           {formattedDate}
         </p>
       </div>
@@ -88,7 +91,7 @@ export const Hero: React.FC<HeroProps> = ({
       <div className="mt-3.5 shrink-0">
         <a
           href="#rsvp"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/80 backdrop-blur-md border border-lavender-200 text-plum/80 text-xs font-medium tracking-wide shadow-xs hover:shadow-md hover:bg-white transition duration-300 group"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/80 backdrop-blur-md border border-lavender-200 text-purple-900/80 text-xs font-medium tracking-wide shadow-xs hover:shadow-md hover:bg-white transition duration-300 group"
         >
           <span>Confirmar Asistencia</span>
           <ChevronDown className="w-3.5 h-3.5 text-purple-600 group-hover:translate-y-0.5 transition-transform duration-300" />
