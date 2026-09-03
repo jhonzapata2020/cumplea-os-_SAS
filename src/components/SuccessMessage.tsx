@@ -2,7 +2,8 @@
 
 import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { Heart, Calendar, Clock, MapPin, Sparkles, RefreshCw, QrCode, Ticket, ExternalLink } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
+import { Heart, Calendar, Clock, MapPin, Sparkles, RefreshCw, Ticket, ExternalLink, Camera, Download } from 'lucide-react';
 import { Event } from '@/types/database';
 import { playCelebrationWaltzSound } from '@/lib/sound';
 
@@ -40,14 +41,15 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
   // Construcción de la URL dinámica para Google Calendar
   const calendarTitle = encodeURIComponent('XV Años de María José');
   const calendarDetails = encodeURIComponent('Celebración de los XV Años de María José Villegas. ¡Nos vemos en la fiesta!');
-  const calendarLocation = encodeURIComponent(`${event.location_name}, ${event.location_details || 'Segundo piso'}`);
+  const calendarLocation = encodeURIComponent(`${event?.location_name || 'Cholas'}, ${event?.location_details || 'Segundo piso'}`);
   // 3 de Octubre de 2026 19:30 - 23:30 (Hora Colombia UTC-5: 20261004T003000Z / 20261004T043000Z)
   const calendarDates = '20261004T003000Z/20261004T043000Z';
   const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calendarTitle}&dates=${calendarDates}&details=${calendarDetails}&location=${calendarLocation}`;
 
-  // Código único estilizado de reserva
+  // Código único de reserva y URL de check-in escaneable
   const cleanNameCode = guestName.replace(/[^a-zA-Z]/g, '').slice(0, 4).toUpperCase() || 'INV';
   const passCode = `MJ-2026-${cleanNameCode}-${String(guestCount).padStart(2, '0')}`;
+  const checkInUrl = `https://cumplea-os-sas.vercel.app/admin/checkin?id=${passCode}`;
 
   return (
     <section className="w-full max-w-md mx-auto my-8 px-4 animate-fade-in-up">
@@ -85,7 +87,7 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
         </div>
 
         {/* 2. PASE DIGITAL VISUAL TIPO CREDENCIAL / TICKET */}
-        <div className="relative overflow-hidden p-5 rounded-2xl bg-gradient-to-b from-plum-dark via-plum to-purple-950 text-white text-left shadow-2xl border border-gold/40 mb-6">
+        <div className="relative overflow-hidden p-5 rounded-2xl bg-gradient-to-b from-plum-dark via-plum to-purple-950 text-white text-left shadow-2xl border border-gold/40 mb-4">
           {/* Adorno holográfico de fondo */}
           <div className="absolute -top-12 -right-12 w-32 h-32 bg-lavender-500/20 rounded-full blur-2xl pointer-events-none" />
           <div className="absolute -bottom-10 -left-10 w-28 h-28 bg-gold/20 rounded-full blur-2xl pointer-events-none" />
@@ -120,23 +122,41 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
             </div>
             <div>
               <p className="text-[10px] text-white/50 uppercase">Lugar</p>
-              <p className="font-medium text-white">Cholas (2do Piso)</p>
+              <p className="font-medium text-white">{event?.location_name || 'Cholas'} (2do Piso)</p>
             </div>
           </div>
 
-          {/* Código QR Estilizado */}
+          {/* Código QR Real Dinámico y Escaneable */}
           <div className="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/10">
-            <div className="p-1.5 bg-white rounded-lg shrink-0">
-              {/* Icono QR Simulado / Estilizado */}
-              <QrCode className="w-12 h-12 text-plum" />
+            <div className="p-2 bg-white rounded-xl shadow-md shrink-0 flex items-center justify-center">
+              <QRCodeSVG
+                value={checkInUrl}
+                size={74}
+                bgColor="#FFFFFF"
+                fgColor="#23132F"
+                level="M"
+                includeMargin={false}
+              />
             </div>
             <div className="text-[11px] text-white/70 leading-tight">
               <p className="font-medium text-white mb-0.5">Pase de Confirmación</p>
               <p className="text-[10px] text-white/60 font-light">
-                Presenta esta pantalla o captura en la recepción del evento.
+                Presenta esta pantalla o captura de pantalla al ingresar a la recepción.
               </p>
             </div>
           </div>
+        </div>
+
+        {/* 3. BOTÓN DE ACCIÓN Y AVISO DE GUARDADO / CAPTURA */}
+        <div className="mb-6 space-y-2">
+          <div className="w-full py-3 px-4 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 font-medium text-xs flex items-center justify-center gap-2 shadow-xs">
+            <Camera className="w-4 h-4 text-purple-600 shrink-0" />
+            <Download className="w-4 h-4 text-purple-600 shrink-0" />
+            <span>📥 Guardar Pase / Tomar Captura</span>
+          </div>
+          <p className="text-[11px] text-stone-500 font-light italic">
+            💡 Te sugerimos tomar una captura de pantalla a este pase para tenerlo a mano en la recepción.
+          </p>
         </div>
 
         {/* Botón para actualizar respuesta si lo necesita */}
