@@ -54,7 +54,7 @@ export const InvitationPage: React.FC<InvitationPageProps> = ({ event }) => {
           celebrantName={event.celebrant_name}
           title={event.title}
           formattedDate={formattedDate}
-          photoUrl={event.slug === 'maria' ? '/maria.jpg' : '/placeholder-celebrant.jpg'}
+          photoUrl="/maria.jpg"
         />
 
         {/* 2. Cuenta Regresiva */}
