@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { Heart, Calendar, Clock, MapPin, Sparkles, RefreshCw, QrCode, Ticket, ExternalLink } from 'lucide-react';
 import { Event } from '@/types/database';
+import { playCelebrationWaltzSound } from '@/lib/sound';
 
 interface SuccessMessageProps {
   event: Event;
@@ -31,6 +32,9 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
     } catch {
       // Ignorar si el navegador restringe animaciones
     }
+
+    // Disparar audio de celebración de vals con desvanecimiento de 5s y resiliencia total
+    playCelebrationWaltzSound();
   }, []);
 
   // Construcción de la URL dinámica para Google Calendar
