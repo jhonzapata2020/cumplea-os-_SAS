@@ -78,18 +78,18 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
 
   return (
     <section className="w-full max-w-md mx-auto my-8 px-4" id="rsvp">
-      <div className="p-6 sm:p-8 rounded-3xl bg-white/70 backdrop-blur-md border border-white/90 shadow-glass">
+      <div className="p-6 sm:p-8 rounded-3xl bg-white/90 backdrop-blur-md border border-purple-100 shadow-xl shadow-purple-900/5">
         {/* Encabezado del Formulario */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-lavender-100/80 text-lavender-700 text-xs font-medium mb-2">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Confirmación</span>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100/80 text-purple-800 text-xs font-medium mb-2 border border-purple-200">
+            <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+            <span>Confirmación de Asistencia</span>
           </div>
-          <h3 className="font-heading text-3xl sm:text-4xl text-plum font-normal">
+          <h3 className="font-heading text-3xl sm:text-4xl text-plum font-semibold">
             Confirma tu asistencia
           </h3>
-          <p className="text-xs text-plum/70 font-light mt-1">
-            Por favor completa tus datos antes del evento.
+          <p className="text-xs text-stone-500 font-light mt-1">
+            Por favor completa tus datos para organizar tu lugar especial.
           </p>
         </div>
 
@@ -104,11 +104,11 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Campo: Nombre Completo */}
           <div>
-            <label className="block text-xs font-medium text-plum/80 mb-1.5 ml-1">
+            <label className="block text-xs font-medium text-stone-700 mb-1.5 ml-1">
               Nombre completo <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-lavender-500">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-purple-500">
                 <User className="w-4 h-4" />
               </div>
               <input
@@ -117,18 +117,18 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Ej. Camila Morales"
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/90 border border-lavender-200 text-plum text-sm placeholder:text-plum/40 focus:outline-none focus:ring-2 focus:ring-lavender-400 focus:border-transparent transition"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-stone-300 text-plum text-sm placeholder:text-stone-400 placeholder:font-light focus:border-purple-600 focus:ring-2 focus:ring-purple-100 outline-none transition"
               />
             </div>
           </div>
 
           {/* Campo: WhatsApp */}
           <div>
-            <label className="block text-xs font-medium text-plum/80 mb-1.5 ml-1">
+            <label className="block text-xs font-medium text-stone-700 mb-1.5 ml-1">
               Número de WhatsApp <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-lavender-500">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-purple-500">
                 <Phone className="w-4 h-4" />
               </div>
               <input
@@ -137,70 +137,72 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
                 value={whatsapp}
                 onChange={(e) => setWhatsapp(e.target.value)}
                 placeholder="Ej. +57 300 123 4567"
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/90 border border-lavender-200 text-plum text-sm placeholder:text-plum/40 focus:outline-none focus:ring-2 focus:ring-lavender-400 focus:border-transparent transition"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-stone-300 text-plum text-sm placeholder:text-stone-400 placeholder:font-light focus:border-purple-600 focus:ring-2 focus:ring-purple-100 outline-none transition"
               />
             </div>
-            <p className="text-[10px] text-plum/50 mt-1 ml-1">
-              Servirá para identificar tu respuesta si deseas actualizarla después.
+            <p className="text-[10px] text-stone-400 mt-1 ml-1">
+              Servirá para identificar tu registro y permitirte modificarlo si lo necesitas.
             </p>
           </div>
 
           {/* Pregunta: ¿Nos acompañas? */}
           <div className="pt-2">
-            <label className="block text-xs font-medium text-plum/80 mb-2 ml-1">
+            <label className="block text-xs font-medium text-stone-700 mb-2 ml-1">
               ¿Nos acompañas? <span className="text-rose-500">*</span>
             </label>
             <div className="grid grid-cols-2 gap-3">
+              {/* Opción SÍ - Estado activo púrpura sólido / inactivo sutil */}
               <button
                 type="button"
                 onClick={() => setAttending(true)}
-                className={`p-3.5 rounded-2xl border flex flex-col items-center justify-center gap-1.5 transition ${
+                className={`p-3.5 rounded-2xl border flex flex-col items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer ${
                   attending === true
-                    ? 'bg-gradient-to-b from-lavender-100 to-white border-lavender-500 text-lavender-900 shadow-sm ring-2 ring-lavender-300'
-                    : 'bg-white/80 border-lavender-200 text-plum/70 hover:bg-lavender-50/50'
+                    ? 'bg-purple-600 text-white border-purple-600 shadow-md font-medium'
+                    : 'bg-stone-50 text-stone-600 border-stone-200 hover:bg-purple-50/50 hover:border-purple-300'
                 }`}
               >
                 <CheckCircle2
                   className={`w-5 h-5 ${
-                    attending === true ? 'text-lavender-600 fill-lavender-200' : 'text-plum/40'
+                    attending === true ? 'text-white fill-purple-500' : 'text-stone-400'
                   }`}
                 />
-                <span className="text-xs font-medium">Sí, estaré ahí</span>
+                <span className="text-xs">Sí, estaré ahí</span>
               </button>
 
+              {/* Opción NO - Estado activo oscuro neutro / inactivo sutil */}
               <button
                 type="button"
                 onClick={() => setAttending(false)}
-                className={`p-3.5 rounded-2xl border flex flex-col items-center justify-center gap-1.5 transition ${
+                className={`p-3.5 rounded-2xl border flex flex-col items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer ${
                   attending === false
-                    ? 'bg-rose-50 border-rose-400 text-rose-900 shadow-sm ring-2 ring-rose-200'
-                    : 'bg-white/80 border-lavender-200 text-plum/70 hover:bg-rose-50/30'
+                    ? 'bg-stone-700 text-white border-stone-700 shadow-md font-medium'
+                    : 'bg-stone-50 text-stone-600 border-stone-200 hover:bg-rose-50/50 hover:border-stone-300'
                 }`}
               >
                 <XCircle
                   className={`w-5 h-5 ${
-                    attending === false ? 'text-rose-500 fill-rose-100' : 'text-plum/40'
+                    attending === false ? 'text-white fill-stone-600' : 'text-stone-400'
                   }`}
                 />
-                <span className="text-xs font-medium">No podré asistir</span>
+                <span className="text-xs">No podré asistir</span>
               </button>
             </div>
           </div>
 
-          {/* Campo condicional: Cantidad de personas */}
+          {/* Campo condicional: Cantidad de personas (Aparece al marcar SÍ) */}
           {attending === true && (
             <div className="pt-2 animate-fade-in">
-              <label className="block text-xs font-medium text-plum/80 mb-1.5 ml-1">
+              <label className="block text-xs font-medium text-stone-700 mb-1.5 ml-1">
                 ¿Cuántas personas asistirán contigo? <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-lavender-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-purple-500">
                   <Users className="w-4 h-4" />
                 </div>
                 <select
                   value={guestCount}
                   onChange={(e) => setGuestCount(Number(e.target.value))}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/90 border border-lavender-200 text-plum text-sm focus:outline-none focus:ring-2 focus:ring-lavender-400 focus:border-transparent transition appearance-none cursor-pointer"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-stone-300 text-plum text-sm focus:border-purple-600 focus:ring-2 focus:ring-purple-100 outline-none transition appearance-none cursor-pointer"
                 >
                   <option value={1}>1 persona (solo yo)</option>
                   <option value={2}>2 personas</option>
@@ -212,13 +214,13 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
             </div>
           )}
 
-          {/* Campo Opcional: Mensaje para María */}
+          {/* Campo Opcional: Mensaje para María José */}
           <div className="pt-2">
-            <label className="block text-xs font-medium text-plum/80 mb-1.5 ml-1">
-              Déjale un mensaje a María <span className="text-plum/40 font-normal">(Opcional)</span>
+            <label className="block text-xs font-medium text-stone-700 mb-1.5 ml-1">
+              Déjale un mensaje a María José <span className="text-stone-400 font-normal">(Opcional)</span>
             </label>
             <div className="relative">
-              <div className="absolute top-3 left-3.5 text-lavender-500">
+              <div className="absolute top-3 left-3.5 text-purple-500">
                 <MessageSquare className="w-4 h-4" />
               </div>
               <textarea
@@ -226,7 +228,7 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Escribe tus felicitaciones o buenos deseos..."
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/90 border border-lavender-200 text-plum text-sm placeholder:text-plum/40 focus:outline-none focus:ring-2 focus:ring-lavender-400 focus:border-transparent transition resize-none"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-stone-300 text-plum text-sm placeholder:text-stone-400 placeholder:font-light focus:border-purple-600 focus:ring-2 focus:ring-purple-100 outline-none transition resize-none"
               />
             </div>
           </div>
@@ -236,7 +238,7 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 rounded-2xl bg-gradient-to-r from-lavender-600 via-purple-600 to-lavender-700 hover:from-lavender-700 hover:to-purple-800 text-white font-medium text-base shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white font-medium text-base shadow-lg shadow-purple-600/20 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
             >
               {loading ? (
                 <>
@@ -245,7 +247,7 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 text-gold-accent" />
+                  <Sparkles className="w-4 h-4 text-amber-300" />
                   <span>Confirmar asistencia</span>
                 </>
               )}
