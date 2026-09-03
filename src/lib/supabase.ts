@@ -4,7 +4,7 @@ import { Event, RSVPFormData, RSVPResult } from '@/types/database';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-// Fallback por defecto para los XV años de María cuando Supabase aún no esté vinculado
+// Fallback por defecto para los XV años de María José
 export const DEFAULT_MARIA_EVENT: Event = {
   id: '00000000-0000-0000-0000-000000000001',
   slug: 'maria',
@@ -34,7 +34,7 @@ export const supabase = isSupabaseConfigured
  */
 export async function getEventBySlug(slug: string): Promise<Event | null> {
   if (!supabase) {
-    if (slug === 'maria') return DEFAULT_MARIA_EVENT;
+    if (slug === 'maria' || slug === 'maria-jose') return DEFAULT_MARIA_EVENT;
     return null;
   }
 
@@ -42,18 +42,28 @@ export async function getEventBySlug(slug: string): Promise<Event | null> {
     const { data, error } = await supabase
       .from('events')
       .select('*')
-      .eq('slug', slug)
-      .single();
+      .or(`slug.eq.${slug},slug.eq.maria,slug.eq.maria-jose`)
+      .limit(1)
+      .maybeSingle();
 
-    if (error || !data) {
-      if (slug === 'maria') return DEFAULT_MARIA_EVENT;
+    if (error) {
+      console.error('Error al consultar el evento en Supabase:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+      });
+    }
+
+    if (!data) {
+      if (slug === 'maria' || slug === 'maria-jose') return DEFAULT_MARIA_EVENT;
       return null;
     }
 
     return data as Event;
   } catch (err) {
-    console.error('Error obteniendo el evento desde Supabase:', err);
-    if (slug === 'maria') return DEFAULT_MARIA_EVENT;
+    console.error('Error de conexión obteniendo el evento:', err);
+    if (slug === 'maria' || slug === 'maria-jose') return DEFAULT_MARIA_EVENT;
     return null;
   }
 }
@@ -82,7 +92,7 @@ export async function submitRSVP(
     };
   }
 
-  // Si Supabase no está configurado, simulamos el registro correctamente
+  // Si Supabase no está configurado, simulamos el registro en modo demostración
   if (!supabase) {
     console.warn('Supabase no está configurado. Simulando guardado de RSVP en memoria.');
     await new Promise((resolve) => setTimeout(resolve, 800));
@@ -94,24 +104,58 @@ export async function submitRSVP(
   }
 
   try {
-    // 1. Buscar si ya existe un invitado para este evento con este WhatsApp
+    // 1. VERIFICACIÓN DEL EVENTO REAL EN SUPABASE
+    // Buscar por ID o por slugs alternativos ('maria' / 'maria-jose') para garantizar que event_id sea válido
+    let realEventId = eventId;
+
+    const { data: eventRow, error: eventError } = await supabase
+      .from('events')
+      .select('id')
+      .or(`id.eq.${eventId},slug.eq.maria,slug.eq.maria-jose`)
+      .limit(1)
+      .maybeSingle();
+
+    if (eventError) {
+      console.error('Error al verificar el evento en Supabase:', {
+        message: eventError.message,
+        details: eventError.details,
+        hint: eventError.hint,
+        code: eventError.code,
+      });
+    }
+
+    if (eventRow) {
+      realEventId = eventRow.id;
+    } else {
+      console.error('No se encontró el evento en Supabase con id o slug maria/maria-jose.');
+    }
+
+    // 2. BUSCAR SI YA EXISTE UN INVITADO PARA ESTE EVENTO Y TELÉFONO
     const { data: existingGuest, error: findError } = await supabase
       .from('guests')
       .select('id')
-      .eq('event_id', eventId)
+      .eq('event_id', realEventId)
       .eq('whatsapp', cleanPhone)
       .maybeSingle();
 
     if (findError) {
-      console.error('Error al buscar invitado existente:', findError);
-      throw new Error('Error de conexión al verificar invitado.');
+      console.error('Detalle completo del error de Supabase al buscar invitado:', {
+        message: findError.message,
+        details: findError.details,
+        hint: findError.hint,
+        code: findError.code,
+      });
+      return {
+        success: false,
+        message: `Error al buscar invitado: ${findError.message || 'Verifica la consola.'}`,
+      };
     }
 
     let guestId: string;
     let isUpdate = false;
 
     if (existingGuest) {
-      // Invitado existente: actualizar nombre y timestamp
+      // INVITADO EXISTENTE: Actualizar nombre y timestamp
       guestId = existingGuest.id;
       isUpdate = true;
 
@@ -124,30 +168,49 @@ export async function submitRSVP(
         .eq('id', guestId);
 
       if (updateGuestError) {
-        console.error('Error actualizando datos de invitado:', updateGuestError);
-        throw new Error('No se pudieron actualizar los datos del invitado.');
+        console.error('Detalle completo del error de Supabase al actualizar invitado:', {
+          message: updateGuestError.message,
+          details: updateGuestError.details,
+          hint: updateGuestError.hint,
+          code: updateGuestError.code,
+        });
+        return {
+          success: false,
+          message: `Error actualizando datos: ${updateGuestError.message}`,
+        };
       }
     } else {
-      // Invitado nuevo: insertar
+      // INVITADO NUEVO: Inserción limpia con tipos exactos
+      const newGuestPayload = {
+        event_id: realEventId,
+        full_name: formData.fullName.trim(),
+        whatsapp: cleanPhone,
+      };
+
       const { data: newGuest, error: insertGuestError } = await supabase
         .from('guests')
-        .insert({
-          event_id: eventId,
-          full_name: formData.fullName.trim(),
-          whatsapp: cleanPhone,
-        })
+        .insert(newGuestPayload)
         .select('id')
         .single();
 
       if (insertGuestError || !newGuest) {
-        console.error('Error registrando nuevo invitado:', insertGuestError);
-        throw new Error('No se pudo guardar la información del invitado.');
+        console.error('Detalle completo del error de Supabase al insertar invitado:', {
+          message: insertGuestError?.message,
+          details: insertGuestError?.details,
+          hint: insertGuestError?.hint,
+          code: insertGuestError?.code,
+          payload: newGuestPayload,
+        });
+        return {
+          success: false,
+          message: `No se pudo guardar la información del invitado: ${insertGuestError?.message || 'Error desconocido en Supabase.'}`,
+        };
       }
 
       guestId = newGuest.id;
     }
 
-    // 2. Registrar o actualizar RSVP
+    // 3. REGISTRAR O ACTUALIZAR RSVP
     const { data: existingRSVP } = await supabase
       .from('rsvps')
       .select('id')
@@ -155,7 +218,7 @@ export async function submitRSVP(
       .maybeSingle();
 
     if (existingRSVP) {
-      // Actualizar respuesta de RSVP
+      // Actualizar RSVP existente
       const { error: updateRSVPError } = await supabase
         .from('rsvps')
         .update({
@@ -167,11 +230,19 @@ export async function submitRSVP(
         .eq('id', existingRSVP.id);
 
       if (updateRSVPError) {
-        console.error('Error actualizando RSVP:', updateRSVPError);
-        throw new Error('No se pudo actualizar tu confirmación.');
+        console.error('Detalle completo del error de Supabase al actualizar RSVP:', {
+          message: updateRSVPError.message,
+          details: updateRSVPError.details,
+          hint: updateRSVPError.hint,
+          code: updateRSVPError.code,
+        });
+        return {
+          success: false,
+          message: `Error actualizando confirmación: ${updateRSVPError.message}`,
+        };
       }
     } else {
-      // Insertar nueva RSVP
+      // Insertar nuevo RSVP
       const { error: insertRSVPError } = await supabase
         .from('rsvps')
         .insert({
@@ -182,8 +253,16 @@ export async function submitRSVP(
         });
 
       if (insertRSVPError) {
-        console.error('Error guardando RSVP:', insertRSVPError);
-        throw new Error('No se pudo registrar la confirmación.');
+        console.error('Detalle completo del error de Supabase al insertar RSVP:', {
+          message: insertRSVPError.message,
+          details: insertRSVPError.details,
+          hint: insertRSVPError.hint,
+          code: insertRSVPError.code,
+        });
+        return {
+          success: false,
+          message: `Error guardando confirmación: ${insertRSVPError.message}`,
+        };
       }
     }
 
@@ -195,7 +274,8 @@ export async function submitRSVP(
       isUpdate,
     };
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'Ocurrió un error inesperado.';
+    const errorMsg = err instanceof Error ? err.message : 'Ocurrió un error inesperado al procesar tu solicitud.';
+    console.error('Excepción capturada en submitRSVP:', err);
     return {
       success: false,
       message: errorMsg,
