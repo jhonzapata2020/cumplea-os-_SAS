@@ -105,7 +105,6 @@ export async function submitRSVP(
 
   try {
     // 1. VERIFICACIÓN DEL EVENTO REAL EN SUPABASE
-    // Buscar por ID o por slugs alternativos ('maria' / 'maria-jose') para garantizar que event_id sea válido
     let realEventId = eventId;
 
     const { data: eventRow, error: eventError } = await supabase
@@ -116,18 +115,11 @@ export async function submitRSVP(
       .maybeSingle();
 
     if (eventError) {
-      console.error('Error al verificar el evento en Supabase:', {
-        message: eventError.message,
-        details: eventError.details,
-        hint: eventError.hint,
-        code: eventError.code,
-      });
+      console.error('Error al verificar el evento en Supabase:', eventError);
     }
 
     if (eventRow) {
       realEventId = eventRow.id;
-    } else {
-      console.error('No se encontró el evento en Supabase con id o slug maria/maria-jose.');
     }
 
     // 2. BUSCAR SI YA EXISTE UN INVITADO PARA ESTE EVENTO Y TELÉFONO
@@ -139,12 +131,7 @@ export async function submitRSVP(
       .maybeSingle();
 
     if (findError) {
-      console.error('Detalle completo del error de Supabase al buscar invitado:', {
-        message: findError.message,
-        details: findError.details,
-        hint: findError.hint,
-        code: findError.code,
-      });
+      console.error('Error de Supabase al buscar invitado:', findError);
       return {
         success: false,
         message: `Error al buscar invitado: ${findError.message || 'Verifica la consola.'}`,
@@ -155,7 +142,7 @@ export async function submitRSVP(
     let isUpdate = false;
 
     if (existingGuest) {
-      // INVITADO EXISTENTE: Actualizar nombre y timestamp
+      // INVITADO EXISTENTE: Actualizar nombre (sin pasar updated_at para compatibilidad total de esquema)
       guestId = existingGuest.id;
       isUpdate = true;
 
@@ -163,17 +150,11 @@ export async function submitRSVP(
         .from('guests')
         .update({
           full_name: formData.fullName.trim(),
-          updated_at: new Date().toISOString(),
         })
         .eq('id', guestId);
 
       if (updateGuestError) {
-        console.error('Detalle completo del error de Supabase al actualizar invitado:', {
-          message: updateGuestError.message,
-          details: updateGuestError.details,
-          hint: updateGuestError.hint,
-          code: updateGuestError.code,
-        });
+        console.error('Error de Supabase al actualizar invitado:', updateGuestError);
         return {
           success: false,
           message: `Error actualizando datos: ${updateGuestError.message}`,
@@ -194,13 +175,7 @@ export async function submitRSVP(
         .single();
 
       if (insertGuestError || !newGuest) {
-        console.error('Detalle completo del error de Supabase al insertar invitado:', {
-          message: insertGuestError?.message,
-          details: insertGuestError?.details,
-          hint: insertGuestError?.hint,
-          code: insertGuestError?.code,
-          payload: newGuestPayload,
-        });
+        console.error('Error de Supabase al insertar invitado:', insertGuestError);
         return {
           success: false,
           message: `No se pudo guardar la información del invitado: ${insertGuestError?.message || 'Error desconocido en Supabase.'}`,
@@ -210,7 +185,7 @@ export async function submitRSVP(
       guestId = newGuest.id;
     }
 
-    // 3. REGISTRAR O ACTUALIZAR RSVP
+    // 3. REGISTRAR O ACTUALIZAR RSVP (sin pasar updated_at para compatibilidad de esquema)
     const { data: existingRSVP } = await supabase
       .from('rsvps')
       .select('id')
@@ -225,17 +200,11 @@ export async function submitRSVP(
           attending: formData.attending,
           guest_count: formData.attending ? formData.guestCount : 0,
           message: formData.message ? formData.message.trim() : null,
-          updated_at: new Date().toISOString(),
         })
         .eq('id', existingRSVP.id);
 
       if (updateRSVPError) {
-        console.error('Detalle completo del error de Supabase al actualizar RSVP:', {
-          message: updateRSVPError.message,
-          details: updateRSVPError.details,
-          hint: updateRSVPError.hint,
-          code: updateRSVPError.code,
-        });
+        console.error('Error de Supabase al actualizar RSVP:', updateRSVPError);
         return {
           success: false,
           message: `Error actualizando confirmación: ${updateRSVPError.message}`,
@@ -253,12 +222,7 @@ export async function submitRSVP(
         });
 
       if (insertRSVPError) {
-        console.error('Detalle completo del error de Supabase al insertar RSVP:', {
-          message: insertRSVPError.message,
-          details: insertRSVPError.details,
-          hint: insertRSVPError.hint,
-          code: insertRSVPError.code,
-        });
+        console.error('Error de Supabase al insertar RSVP:', insertRSVPError);
         return {
           success: false,
           message: `Error guardando confirmación: ${insertRSVPError.message}`,
