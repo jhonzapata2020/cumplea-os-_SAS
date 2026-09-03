@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { QRCodeSVG } from 'qrcode.react';
-import { Heart, Calendar, Clock, MapPin, Sparkles, RefreshCw, Ticket, ExternalLink, Camera, Download } from 'lucide-react';
+import { Heart, Sparkles, RefreshCw, Ticket, Camera, Download } from 'lucide-react';
 import { Event } from '@/types/database';
 import { playCelebrationWaltzSound } from '@/lib/sound';
 
@@ -38,14 +38,6 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
     playCelebrationWaltzSound();
   }, []);
 
-  // Construcción de la URL dinámica para Google Calendar
-  const calendarTitle = encodeURIComponent('XV Años de María José');
-  const calendarDetails = encodeURIComponent('Celebración de los XV Años de María José Villegas. ¡Nos vemos en la fiesta!');
-  const calendarLocation = encodeURIComponent(`${event?.location_name || 'Cholas'}, ${event?.location_details || 'Segundo piso'}`);
-  // 3 de Octubre de 2026 19:30 - 23:30 (Hora Colombia UTC-5: 20261004T003000Z / 20261004T043000Z)
-  const calendarDates = '20261004T003000Z/20261004T043000Z';
-  const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calendarTitle}&dates=${calendarDates}&details=${calendarDetails}&location=${calendarLocation}`;
-
   // Código único de reserva y URL de check-in escaneable
   const cleanNameCode = guestName.replace(/[^a-zA-Z]/g, '').slice(0, 4).toUpperCase() || 'INV';
   const passCode = `MJ-2026-${cleanNameCode}-${String(guestCount).padStart(2, '0')}`;
@@ -72,21 +64,7 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
           María José estará feliz de compartir este momento inolvidable contigo.
         </p>
 
-        {/* 1. BOTÓN: GUARDAR EN GOOGLE CALENDAR */}
-        <div className="mb-6">
-          <a
-            href={googleCalendarUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2.5 w-full py-3.5 px-5 rounded-2xl bg-white border border-lavender-200 text-plum font-medium text-xs sm:text-sm shadow-sm hover:shadow-md hover:bg-lavender-50/50 transition duration-300"
-          >
-            <Calendar className="w-4 h-4 text-lavender-600" />
-            <span>📅 Guardar en Google Calendar</span>
-            <ExternalLink className="w-3.5 h-3.5 text-plum/40 ml-auto" />
-          </a>
-        </div>
-
-        {/* 2. PASE DIGITAL VISUAL TIPO CREDENCIAL / TICKET */}
+        {/* 1. PASE DIGITAL VISUAL TIPO CREDENCIAL / TICKET */}
         <div className="relative overflow-hidden p-5 rounded-2xl bg-gradient-to-b from-plum-dark via-plum to-purple-950 text-white text-left shadow-2xl border border-gold/40 mb-4">
           {/* Adorno holográfico de fondo */}
           <div className="absolute -top-12 -right-12 w-32 h-32 bg-lavender-500/20 rounded-full blur-2xl pointer-events-none" />
@@ -109,8 +87,10 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
             <p className="text-base sm:text-lg font-semibold text-white font-heading tracking-wide">
               {guestName}
             </p>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/10 text-gold-accent text-xs font-medium mt-1">
-              <span>{guestCount} {guestCount === 1 ? 'Persona / Pase Individual' : `Personas (${guestCount} Pases)`}</span>
+
+            {/* Pastilla con indicación clara de 1 persona o más personas */}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 text-gold-accent text-xs font-semibold mt-1 border border-gold/30 shadow-xs">
+              <span>{guestCount === 1 ? 'Pase válido para 1 persona' : `Pase válido para ${guestCount} personas`}</span>
             </div>
           </div>
 
@@ -141,21 +121,21 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
             <div className="text-[11px] text-white/70 leading-tight">
               <p className="font-medium text-white mb-0.5">Pase de Confirmación</p>
               <p className="text-[10px] text-white/60 font-light">
-                Presenta esta pantalla o captura de pantalla al ingresar a la recepción.
+                Presenta este pase en tu pantalla al ingresar a la recepción.
               </p>
             </div>
           </div>
         </div>
 
-        {/* 3. BOTÓN DE ACCIÓN Y AVISO DE GUARDADO / CAPTURA */}
+        {/* 2. BOTÓN DE ACCIÓN Y AVISO DE GUARDADO EN GALERÍA (CAPTURA) */}
         <div className="mb-6 space-y-2">
-          <div className="w-full py-3 px-4 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 font-medium text-xs flex items-center justify-center gap-2 shadow-xs">
+          <div className="w-full py-3.5 px-4 rounded-2xl bg-purple-50 border border-purple-200 text-purple-900 font-medium text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs">
             <Camera className="w-4 h-4 text-purple-600 shrink-0" />
             <Download className="w-4 h-4 text-purple-600 shrink-0" />
-            <span>📥 Guardar Pase / Tomar Captura</span>
+            <span>📸 Guardar Pase en Galería / Tomar Captura</span>
           </div>
-          <p className="text-[11px] text-stone-500 font-light italic">
-            💡 Te sugerimos tomar una captura de pantalla a este pase para tenerlo a mano en la recepción.
+          <p className="text-[11px] text-stone-500 font-light italic leading-relaxed">
+            💡 Te sugerimos tomar una captura de pantalla a este pase para guardarlo en tu galería y tenerlo a mano en la recepción.
           </p>
         </div>
 
