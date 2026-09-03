@@ -172,7 +172,7 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
             ) : (
               <>
                 <Download className="w-4 h-4 text-amber-300" />
-                <span>📥 Descargar Pase Digital en Imagen (PNG)</span>
+                <span>📥 Guardar Pase en Galería (PNG)</span>
               </>
             )}
           </button>
