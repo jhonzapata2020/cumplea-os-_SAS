@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { QRCodeSVG } from 'qrcode.react';
-import { Heart, Sparkles, RefreshCw, Ticket, Camera, Download } from 'lucide-react';
+import { toPng } from 'html-to-image';
+import { Heart, Sparkles, RefreshCw, Ticket, Download, Loader2 } from 'lucide-react';
 import { Event } from '@/types/database';
 import { playCelebrationWaltzSound } from '@/lib/sound';
 
@@ -22,6 +23,9 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
   guestCount = 1,
   onReset,
 }) => {
+  const passRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
+
   useEffect(() => {
     try {
       confetti({
@@ -42,6 +46,28 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
   const cleanNameCode = guestName.replace(/[^a-zA-Z]/g, '').slice(0, 4).toUpperCase() || 'INV';
   const passCode = `MJ-2026-${cleanNameCode}-${String(guestCount).padStart(2, '0')}`;
   const checkInUrl = `https://cumplea-os-sas.vercel.app/admin/checkin?id=${passCode}`;
+
+  // Función para generar y descargar la imagen PNG real del pase digital
+  const handleDownloadPNG = async () => {
+    if (!passRef.current) return;
+    try {
+      setDownloading(true);
+      const dataUrl = await toPng(passRef.current, {
+        cacheBust: true,
+        pixelRatio: 2,
+        backgroundColor: '#160B1E',
+      });
+      const link = document.createElement('a');
+      link.download = `Pase-XV-MariaJose-${cleanNameCode}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Error al generar imagen PNG:', err);
+      alert('Te sugerimos tomar una captura de pantalla a la credencial en tu celular.');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <section className="w-full max-w-md mx-auto my-8 px-4 animate-fade-in-up">
@@ -64,8 +90,11 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
           María José estará feliz de compartir este momento inolvidable contigo.
         </p>
 
-        {/* 1. PASE DIGITAL VISUAL TIPO CREDENCIAL / TICKET */}
-        <div className="relative overflow-hidden p-5 rounded-2xl bg-gradient-to-b from-plum-dark via-plum to-purple-950 text-white text-left shadow-2xl border border-gold/40 mb-4">
+        {/* 1. PASE DIGITAL VISUAL TIPO CREDENCIAL / TICKET CON REF PARA CAPTURA PNG */}
+        <div
+          ref={passRef}
+          className="relative overflow-hidden p-5 rounded-2xl bg-gradient-to-b from-plum-dark via-plum to-purple-950 text-white text-left shadow-2xl border border-gold/40 mb-5"
+        >
           {/* Adorno holográfico de fondo */}
           <div className="absolute -top-12 -right-12 w-32 h-32 bg-lavender-500/20 rounded-full blur-2xl pointer-events-none" />
           <div className="absolute -bottom-10 -left-10 w-28 h-28 bg-gold/20 rounded-full blur-2xl pointer-events-none" />
@@ -127,15 +156,28 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
           </div>
         </div>
 
-        {/* 2. BOTÓN DE ACCIÓN Y AVISO DE GUARDADO EN GALERÍA (CAPTURA) */}
+        {/* 2. BOTÓN FUNCIONAL DE DESCARGA PNG Y AVISO */}
         <div className="mb-6 space-y-2">
-          <div className="w-full py-3.5 px-4 rounded-2xl bg-purple-50 border border-purple-200 text-purple-900 font-medium text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs">
-            <Camera className="w-4 h-4 text-purple-600 shrink-0" />
-            <Download className="w-4 h-4 text-purple-600 shrink-0" />
-            <span>📸 Guardar Pase en Galería / Tomar Captura</span>
-          </div>
+          <button
+            type="button"
+            onClick={handleDownloadPNG}
+            disabled={downloading}
+            className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-70 cursor-pointer"
+          >
+            {downloading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-amber-300" />
+                <span>Generando imagen PNG...</span>
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4 text-amber-300" />
+                <span>📥 Descargar Pase Digital en Imagen (PNG)</span>
+              </>
+            )}
+          </button>
           <p className="text-[11px] text-stone-500 font-light italic leading-relaxed">
-            💡 Te sugerimos tomar una captura de pantalla a este pase para guardarlo en tu galería y tenerlo a mano en la recepción.
+            💡 Guarda la imagen en tu celular o tómale una captura de pantalla para presentarla fácilmente en la recepción.
           </p>
         </div>
 
