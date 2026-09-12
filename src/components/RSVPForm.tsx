@@ -36,18 +36,18 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
     }
 
     const cleanPhone = whatsapp.replace(/\D/g, '');
-    if (cleanPhone.length < 7) {
-      setErrorMsg('Por favor ingresa un número de WhatsApp válido (mínimo 7 dígitos).');
+    if (cleanPhone.length < 7 || cleanPhone.length > 15) {
+      setErrorMsg('Por favor ingresa un número de WhatsApp válido (7 a 15 dígitos).');
       return;
     }
 
     if (attending === null) {
-      setErrorMsg('Por favor indica si podrás acompañarnos.');
+      setErrorMsg('Por favor indica si podrás acompañarnos en la celebración.');
       return;
     }
 
     if (attending && (guestCount < 1 || isNaN(guestCount))) {
-      setErrorMsg('La cantidad de personas debe ser al menos 1.');
+      setErrorMsg('La cantidad de asistentes debe ser al menos 1.');
       return;
     }
 
@@ -79,6 +79,7 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
   return (
     <section className="w-full max-w-md mx-auto my-8 px-4" id="rsvp">
       <div className="p-6 sm:p-8 rounded-3xl bg-white/90 backdrop-blur-md border border-purple-100 shadow-xl shadow-purple-900/5">
+        
         {/* Encabezado del Formulario */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100/80 text-purple-800 text-xs font-medium mb-2 border border-purple-200">
@@ -89,13 +90,17 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
             Confirma tu asistencia
           </h3>
           <p className="text-xs text-stone-500 font-light mt-1">
-            Por favor completa tus datos para organizar tu lugar especial.
+            Por favor completa tus datos para reservar tu lugar especial.
           </p>
         </div>
 
-        {/* Mensaje de Error Elegante */}
+        {/* Mensaje de Error Elegante accesible */}
         {errorMsg && (
-          <div className="mb-5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5 animate-fade-in">
+          <div
+            id="rsvp-error"
+            role="alert"
+            className="mb-5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5 animate-fade-in"
+          >
             <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
             <span>{errorMsg}</span>
           </div>
@@ -104,7 +109,7 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Campo: Nombre Completo */}
           <div>
-            <label className="block text-xs font-medium text-stone-700 mb-1.5 ml-1">
+            <label htmlFor="fullName" className="block text-xs font-medium text-stone-700 mb-1.5 ml-1">
               Nombre completo <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
@@ -112,11 +117,17 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
                 <User className="w-4 h-4" />
               </div>
               <input
+                id="fullName"
+                name="fullName"
                 type="text"
                 required
+                autoComplete="name"
+                maxLength={120}
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Ej. Camila Morales"
+                aria-invalid={Boolean(errorMsg && !fullName.trim())}
+                aria-describedby={errorMsg ? 'rsvp-error' : undefined}
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-stone-300 text-plum text-sm placeholder:text-stone-400 placeholder:font-light focus:border-purple-600 focus:ring-2 focus:ring-purple-100 outline-none transition"
               />
             </div>
@@ -124,7 +135,7 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
 
           {/* Campo: WhatsApp */}
           <div>
-            <label className="block text-xs font-medium text-stone-700 mb-1.5 ml-1">
+            <label htmlFor="whatsapp" className="block text-xs font-medium text-stone-700 mb-1.5 ml-1">
               Número de WhatsApp <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
@@ -132,28 +143,37 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
                 <Phone className="w-4 h-4" />
               </div>
               <input
+                id="whatsapp"
+                name="whatsapp"
                 type="tel"
                 required
+                autoComplete="tel"
+                inputMode="tel"
+                maxLength={18}
                 value={whatsapp}
                 onChange={(e) => setWhatsapp(e.target.value)}
-                placeholder="Ej. +57 300 123 4567"
+                placeholder="Ej. 300 123 4567"
+                aria-invalid={Boolean(errorMsg && !whatsapp.trim())}
+                aria-describedby="whatsapp-help"
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-stone-300 text-plum text-sm placeholder:text-stone-400 placeholder:font-light focus:border-purple-600 focus:ring-2 focus:ring-purple-100 outline-none transition"
               />
             </div>
-            <p className="text-[10px] text-stone-400 mt-1 ml-1">
-              Servirá para identificar tu registro y permitirte modificarlo si lo necesitas.
+            <p id="whatsapp-help" className="text-[10px] text-stone-500 mt-1 ml-1 leading-tight">
+              Solo lo usaremos para organizar la recepción y actualizar tu confirmación.
             </p>
           </div>
 
-          {/* Pregunta: ¿Nos acompañas? */}
-          <div className="pt-2">
-            <label className="block text-xs font-medium text-stone-700 mb-2 ml-1">
+          {/* Selector accesible Fieldset: ¿Nos acompañas? */}
+          <fieldset className="pt-2 border-none p-0 m-0">
+            <legend className="block text-xs font-medium text-stone-700 mb-2 ml-1">
               ¿Nos acompañas? <span className="text-rose-500">*</span>
-            </label>
-            <div className="grid grid-cols-2 gap-3">
-              {/* Opción SÍ - Estado activo púrpura sólido / inactivo sutil */}
+            </legend>
+            <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Confirmar asistencia">
+              {/* Opción SÍ */}
               <button
                 type="button"
+                role="radio"
+                aria-checked={attending === true}
                 onClick={() => setAttending(true)}
                 className={`p-3.5 rounded-2xl border flex flex-col items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer ${
                   attending === true
@@ -169,9 +189,11 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
                 <span className="text-xs">Sí, estaré ahí</span>
               </button>
 
-              {/* Opción NO - Estado activo oscuro neutro / inactivo sutil */}
+              {/* Opción NO */}
               <button
                 type="button"
+                role="radio"
+                aria-checked={attending === false}
                 onClick={() => setAttending(false)}
                 className={`p-3.5 rounded-2xl border flex flex-col items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer ${
                   attending === false
@@ -187,21 +209,24 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
                 <span className="text-xs">No podré asistir</span>
               </button>
             </div>
-          </div>
+          </fieldset>
 
           {/* Campo condicional: Cantidad de personas (Aparece al marcar SÍ) */}
           {attending === true && (
             <div className="pt-2 animate-fade-in">
-              <label className="block text-xs font-medium text-stone-700 mb-1.5 ml-1">
-                ¿Cuántas personas asistirán contigo? <span className="text-rose-500">*</span>
+              <label htmlFor="guestCount" className="block text-xs font-medium text-stone-700 mb-1.5 ml-1">
+                ¿Cuántas personas asistirán en total? <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-purple-500">
                   <Users className="w-4 h-4" />
                 </div>
                 <select
+                  id="guestCount"
+                  name="guestCount"
                   value={guestCount}
                   onChange={(e) => setGuestCount(Number(e.target.value))}
+                  aria-describedby="guestCount-help"
                   className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-stone-300 text-plum text-sm focus:border-purple-600 focus:ring-2 focus:ring-purple-100 outline-none transition appearance-none cursor-pointer"
                 >
                   <option value={1}>1 persona (solo yo)</option>
@@ -211,12 +236,15 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
                   <option value={5}>5 personas</option>
                 </select>
               </div>
+              <p id="guestCount-help" className="text-[10px] text-stone-500 mt-1 ml-1">
+                Total de asistentes, incluyéndote a ti.
+              </p>
             </div>
           )}
 
           {/* Campo Opcional: Mensaje para María José */}
           <div className="pt-2">
-            <label className="block text-xs font-medium text-stone-700 mb-1.5 ml-1">
+            <label htmlFor="message" className="block text-xs font-medium text-stone-700 mb-1.5 ml-1">
               Déjale un mensaje a María José <span className="text-stone-400 font-normal">(Opcional)</span>
             </label>
             <div className="relative">
@@ -224,7 +252,10 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
                 <MessageSquare className="w-4 h-4" />
               </div>
               <textarea
+                id="message"
+                name="message"
                 rows={3}
+                maxLength={500}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Escribe tus felicitaciones o buenos deseos..."

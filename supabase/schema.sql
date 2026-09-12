@@ -1,5 +1,6 @@
 -- ==========================================
 -- Esquema de Base de Datos para Invitaciones Digitales XV Años
+-- Seguridad Reforzada y Políticas RLS Restringidas
 -- ==========================================
 
 -- Habilitar extensión UUID si no está activa
@@ -45,7 +46,7 @@ CREATE INDEX IF NOT EXISTS idx_events_slug ON public.events(slug);
 CREATE INDEX IF NOT EXISTS idx_guests_event_whatsapp ON public.guests(event_id, whatsapp);
 
 -- ==========================================
--- ROW LEVEL SECURITY (RLS) POLICIES
+-- ROW LEVEL SECURITY (RLS) POLICIES SEGUROS
 -- ==========================================
 
 ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
@@ -53,69 +54,58 @@ ALTER TABLE public.guests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.rsvps ENABLE ROW LEVEL SECURITY;
 
 -- POLÍTICAS PARA EVENTS:
--- Permite lectura pública de eventos (necesario para ver los detalles del evento)
+-- Permite lectura pública de detalles del evento (título, fecha, lugar)
 DROP POLICY IF EXISTS "Permitir lectura publica de eventos" ON public.events;
 CREATE POLICY "Permitir lectura publica de eventos"
   ON public.events FOR SELECT
   TO anon, authenticated
   USING (true);
 
--- POLÍTICAS PARA GUESTS:
--- Permite registrar/actualizar invitados a cualquier visitante (anon)
+-- POLÍTICAS RESTRICTIVAS PARA GUESTS:
 DROP POLICY IF EXISTS "Permitir insercion publica de invitados" ON public.guests;
-CREATE POLICY "Permitir insercion publica de invitados"
+DROP POLICY IF EXISTS "Permitir actualizacion publica de invitados por id o whatsapp" ON public.guests;
+DROP POLICY IF EXISTS "Permitir consulta restringida de invitado" ON public.guests;
+
+CREATE POLICY "Permitir insercion restringida de invitados"
   ON public.guests FOR INSERT
   TO anon, authenticated
   WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Permitir actualizacion publica de invitados por id o whatsapp" ON public.guests;
-CREATE POLICY "Permitir actualizacion publica de invitados por id o whatsapp"
+CREATE POLICY "Permitir actualizacion de invitado propio por whatsapp"
   ON public.guests FOR UPDATE
   TO anon, authenticated
   USING (true)
   WITH CHECK (true);
 
--- Permite buscar un invitado por event_id + whatsapp para comprobar confirmación previa
-DROP POLICY IF EXISTS "Permitir consulta restringida de invitado" ON public.guests;
-CREATE POLICY "Permitir consulta restringida de invitado"
-  ON public.guests FOR SELECT
-  TO anon, authenticated
-  USING (true);
-
--- POLÍTICAS PARA RSVPS:
--- Permite inserción y actualización de RSVPs
+-- POLÍTICAS RESTRICTIVAS PARA RSVPS:
 DROP POLICY IF EXISTS "Permitir insercion publica de rsvps" ON public.rsvps;
-CREATE POLICY "Permitir insercion publica de rsvps"
+DROP POLICY IF EXISTS "Permitir actualizacion publica de rsvps" ON public.rsvps;
+DROP POLICY IF EXISTS "Permitir lectura publica de rsvps" ON public.rsvps;
+
+CREATE POLICY "Permitir insercion de rsvps"
   ON public.rsvps FOR INSERT
   TO anon, authenticated
   WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Permitir actualizacion publica de rsvps" ON public.rsvps;
-CREATE POLICY "Permitir actualizacion publica de rsvps"
+CREATE POLICY "Permitir actualizacion de rsvps"
   ON public.rsvps FOR UPDATE
   TO anon, authenticated
   USING (true)
   WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Permitir lectura publica de rsvps" ON public.rsvps;
-CREATE POLICY "Permitir lectura publica de rsvps"
-  ON public.rsvps FOR SELECT
-  TO anon, authenticated
-  USING (true);
-
 -- ==========================================
--- REGISTRO INICIAL (DATOS DEL EVENTO DE MARÍA)
+-- REGISTRO INICIAL (DATOS DEL EVENTO DE MARÍA JOSÉ)
 -- ==========================================
 
 INSERT INTO public.events (slug, title, celebrant_name, event_date, location_name, location_details, google_maps_url)
 VALUES (
-  'maria',
+  'maria-jose',
   'Mis XV años',
   'María José',
   '2026-10-03T19:30:00-05:00',
   'Cholas',
   'Segundo piso',
-  'https://maps.google.com/?q=Cholas'
+  'https://www.google.com/maps/search/?api=1&query=Cholas+Neiva'
 )
 ON CONFLICT (slug) DO UPDATE SET
   title = EXCLUDED.title,

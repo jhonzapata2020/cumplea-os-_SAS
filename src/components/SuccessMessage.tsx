@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { QRCodeSVG } from 'qrcode.react';
 import { toPng } from 'html-to-image';
-import { Heart, Sparkles, RefreshCw, Ticket, Download, Loader2 } from 'lucide-react';
+import { Heart, Sparkles, RefreshCw, Ticket, Download, Loader2, Volume2 } from 'lucide-react';
 import { Event } from '@/types/database';
 import { playCelebrationWaltzSound } from '@/lib/sound';
 
@@ -25,22 +25,34 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
 }) => {
   const passRef = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 
   useEffect(() => {
-    try {
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#D8B4F8', '#FFF0F5', '#D4AF37', '#8B5CF6'],
-      });
-    } catch {
-      // Ignorar si el navegador restringe animaciones
-    }
+    // Verificar si el usuario prefiere movimiento reducido
+    const prefersReducedMotion = typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Disparar audio de celebración de vals con desvanecimiento de 5s y resiliencia total
-    playCelebrationWaltzSound();
+    if (!prefersReducedMotion) {
+      try {
+        confetti({
+          particleCount: 70,
+          spread: 60,
+          origin: { y: 0.6 },
+          colors: ['#D8B4F8', '#FFF0F5', '#D4AF37', '#8B5CF6'],
+        });
+      } catch {
+        // Ignorar si el navegador no soporta o restringe canvas
+      }
+    }
   }, []);
+
+  const handlePlayAudio = () => {
+    setIsPlayingAudio(true);
+    playCelebrationWaltzSound();
+    setTimeout(() => {
+      setIsPlayingAudio(false);
+    }, 5000);
+  };
 
   // Código único de reserva y URL de check-in escaneable
   const cleanNameCode = guestName.replace(/[^a-zA-Z]/g, '').slice(0, 4).toUpperCase() || 'INV';
@@ -70,8 +82,13 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
   };
 
   return (
-    <section className="w-full max-w-md mx-auto my-8 px-4 animate-fade-in-up">
+    <section
+      id="success-pass"
+      aria-live="polite"
+      className="w-full max-w-md mx-auto my-8 px-4 animate-fade-in-up"
+    >
       <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-white/95 via-white/90 to-rose-soft/50 backdrop-blur-md border border-white/90 shadow-glass text-center">
+        
         {/* Icono de Corazón Celebrativo */}
         <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-tr from-lavender-100 to-rose-blush border-2 border-gold/40 flex items-center justify-center shadow-gold-glow">
           <Heart className="w-8 h-8 text-rose-accent fill-rose-blush animate-bounce" />
@@ -86,11 +103,24 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
           ¡Gracias por confirmar!
         </h3>
 
-        <p className="text-sm text-plum/80 font-light leading-relaxed mb-6">
+        <p className="text-sm text-plum/80 font-light leading-relaxed mb-4">
           María José estará feliz de compartir este momento inolvidable contigo.
         </p>
 
-        {/* 1. PASE DIGITAL VISUAL TIPO CREDENCIAL / TICKET CON REF PARA CAPTURA PNG */}
+        {/* Botón Accesible para reproducir Audio de Vals */}
+        <div className="mb-6">
+          <button
+            type="button"
+            onClick={handlePlayAudio}
+            disabled={isPlayingAudio}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-lavender-100 hover:bg-lavender-200 border border-lavender-300 text-purple-900 text-xs font-medium transition cursor-pointer shadow-xs"
+          >
+            <Volume2 className={`w-4 h-4 text-purple-600 ${isPlayingAudio ? 'animate-pulse' : ''}`} />
+            <span>{isPlayingAudio ? 'Reproduciendo vals...' : '🎵 Escuchar saludo musical'}</span>
+          </button>
+        </div>
+
+        {/* PASE DIGITAL VISUAL TIPO CREDENCIAL / TICKET */}
         <div
           ref={passRef}
           className="relative overflow-hidden p-5 rounded-2xl bg-gradient-to-b from-plum-dark via-plum to-purple-950 text-white text-left shadow-2xl border border-gold/40 mb-5"
@@ -117,7 +147,7 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
               {guestName}
             </p>
 
-            {/* Pastilla con indicación clara de 1 persona o más personas */}
+            {/* Indicación clara de 1 persona o más personas */}
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 text-gold-accent text-xs font-semibold mt-1 border border-gold/30 shadow-xs">
               <span>{guestCount === 1 ? 'Pase válido para 1 persona' : `Pase válido para ${guestCount} personas`}</span>
             </div>
@@ -156,7 +186,7 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
           </div>
         </div>
 
-        {/* 2. BOTÓN FUNCIONAL DE DESCARGA PNG Y AVISO */}
+        {/* BOTÓN DE DESCARGA PNG */}
         <div className="mb-6 space-y-2">
           <button
             type="button"
@@ -181,10 +211,10 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
           </p>
         </div>
 
-        {/* Botón para actualizar respuesta si lo necesita */}
+        {/* Botón para actualizar respuesta */}
         <button
           onClick={onReset}
-          className="inline-flex items-center justify-center gap-2 text-xs text-lavender-700 hover:text-lavender-900 underline font-medium transition"
+          className="inline-flex items-center justify-center gap-2 text-xs text-lavender-700 hover:text-lavender-900 underline font-medium transition cursor-pointer"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           <span>¿Deseas modificar tu respuesta?</span>

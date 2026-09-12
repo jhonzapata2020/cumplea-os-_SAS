@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Heart, FileText } from 'lucide-react';
-import { AdminExportModal } from './AdminExportModal';
+import { Heart, FileText, Lock } from 'lucide-react';
+import { AdminGuestListModal } from './AdminGuestListModal';
 
 interface FooterProps {
   showAdminExport?: boolean;
@@ -22,21 +22,21 @@ export const Footer: React.FC<FooterProps> = ({ showAdminExport = true }) => {
         3 de Octubre de 2026 · Celebración Especial
       </p>
 
-      {/* Acceso para descargar lista de invitados en PDF (solo visible antes de registrarse) */}
+      {/* Acceso discreto para la cumpleañera / anfitrión */}
       {showAdminExport && (
         <div>
           <button
             onClick={() => setIsModalOpen(true)}
             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-purple-50 hover:bg-purple-100 border border-purple-200 text-xs text-purple-900 font-medium transition cursor-pointer shadow-xs hover:shadow-sm"
           >
-            <FileText className="w-3.5 h-3.5 text-purple-600" />
-            <span>👑 Lista de Invitados (PDF)</span>
+            <Lock className="w-3.5 h-3.5 text-purple-600" />
+            <span>👑 Lista de Invitados</span>
           </button>
         </div>
       )}
 
-      {/* Modal de descarga protegido por PIN */}
-      <AdminExportModal
+      {/* Modal Dashboard protegido por PIN */}
+      <AdminGuestListModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />

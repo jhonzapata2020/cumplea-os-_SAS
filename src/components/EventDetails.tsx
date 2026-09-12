@@ -1,18 +1,22 @@
 'use client';
 
 import React from 'react';
-import { Calendar, Clock, MapPin, ExternalLink, Gift, Sparkles, Shirt } from 'lucide-react';
+import { Calendar, Clock, MapPin, ExternalLink, Gift, Shirt, PhoneCall, Info, Download } from 'lucide-react';
 import { Event } from '@/types/database';
+import { formatEventDateOnly, formatEventTimeOnly, generateGoogleCalendarUrl, downloadICSFile } from '@/lib/formatEventDate';
 
 interface EventDetailsProps {
   event: Event;
 }
 
 export const EventDetails: React.FC<EventDetailsProps> = ({ event }) => {
-  const mapsUrl = event.google_maps_url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location_name + ' ' + (event.location_details || ''))}`;
+  const mapsUrl = event.google_maps_url || 'https://www.google.com/maps/search/?api=1&query=Cholas+Neiva';
+  const formattedDateOnly = formatEventDateOnly(event.event_date);
+  const formattedTimeOnly = formatEventTimeOnly(event.event_date);
+  const googleCalUrl = generateGoogleCalendarUrl(event);
 
   return (
-    <section className="w-full max-w-md mx-auto my-8 px-4">
+    <section className="w-full max-w-md mx-auto my-8 px-4" id="detalles">
       <div className="text-center mb-6">
         <h3 className="font-heading text-3xl sm:text-4xl text-plum font-normal tracking-wide">
           El gran día
@@ -30,7 +34,7 @@ export const EventDetails: React.FC<EventDetailsProps> = ({ event }) => {
           </div>
           <div>
             <p className="text-xs font-medium uppercase tracking-wider text-plum/60">Fecha</p>
-            <p className="text-base font-semibold text-plum font-heading">Sábado, 3 de Octubre</p>
+            <p className="text-base font-semibold text-plum font-heading">{formattedDateOnly}</p>
             <p className="text-xs text-plum/70 font-light">2026</p>
           </div>
         </div>
@@ -42,7 +46,7 @@ export const EventDetails: React.FC<EventDetailsProps> = ({ event }) => {
           </div>
           <div>
             <p className="text-xs font-medium uppercase tracking-wider text-plum/60">Hora</p>
-            <p className="text-base font-semibold text-plum font-heading">7:30 PM</p>
+            <p className="text-base font-semibold text-plum font-heading">{formattedTimeOnly}</p>
             <p className="text-xs text-plum/70 font-light">Puntual asistencia</p>
           </div>
         </div>
@@ -54,7 +58,7 @@ export const EventDetails: React.FC<EventDetailsProps> = ({ event }) => {
           </div>
           <div className="flex-1">
             <p className="text-xs font-medium uppercase tracking-wider text-plum/60">Lugar</p>
-            <p className="text-base font-semibold text-plum font-heading">{event.location_name}</p>
+            <p className="text-base font-semibold text-plum font-heading">{event.location_name || 'Cholas'}</p>
             {event.location_details && (
               <p className="text-xs text-plum/70 font-light">{event.location_details}</p>
             )}
@@ -92,20 +96,73 @@ export const EventDetails: React.FC<EventDetailsProps> = ({ event }) => {
             &ldquo;Tu presencia es mi mayor regalo. Si deseas hacerme un detalle, contaremos con lluvia de sobres en el salón.&rdquo;
           </p>
         </div>
+
+        {/* TARJETA: APOYO LOGÍSTICO Y ACCESOS */}
+        <div className="p-5 rounded-2xl bg-white/70 backdrop-blur-md border border-white/90 shadow-glass text-left">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center text-purple-700 border border-purple-200">
+              <Info className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-plum font-heading">Información Logística</h4>
+              <p className="text-xs text-purple-700 font-medium">Accesos y Parqueadero</p>
+            </div>
+          </div>
+          <ul className="text-xs text-plum/80 font-light leading-relaxed mt-2 pt-2 border-t border-purple-100 space-y-1.5 list-disc list-inside">
+            <li>El salón se encuentra ubicado en el <span className="font-medium">segundo piso</span>.</li>
+            <li>Contamos con parqueadero y zonas de ascenso en la recepción.</li>
+          </ul>
+        </div>
       </div>
 
-      {/* Botón Ver Ubicación */}
-      <div className="mt-6 text-center">
+      {/* Botones de Acción Prácticos para el Invitado */}
+      <div className="mt-6 space-y-3 text-center">
+        {/* Ubicación Google Maps */}
         <a
           href={mapsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-gradient-to-r from-lavender-600 via-purple-600 to-lavender-700 text-white font-medium text-sm shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
+          className="inline-flex items-center justify-center gap-2 w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-lavender-600 via-purple-600 to-lavender-700 text-white font-medium text-sm shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer"
         >
           <MapPin className="w-4 h-4 text-gold-accent" />
           <span>Ver ubicación en Google Maps</span>
           <ExternalLink className="w-3.5 h-3.5 opacity-80" />
         </a>
+
+        {/* Opciones de Calendario */}
+        <div className="grid grid-cols-2 gap-2">
+          <a
+            href={googleCalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white border border-purple-200 text-plum font-medium text-xs shadow-xs hover:bg-purple-50 transition cursor-pointer"
+          >
+            <Calendar className="w-3.5 h-3.5 text-purple-600" />
+            <span>Google Calendar</span>
+          </a>
+
+          <button
+            type="button"
+            onClick={() => downloadICSFile(event)}
+            className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white border border-purple-200 text-plum font-medium text-xs shadow-xs hover:bg-purple-50 transition cursor-pointer"
+          >
+            <Download className="w-3.5 h-3.5 text-purple-600" />
+            <span>Descargar .ics</span>
+          </button>
+        </div>
+
+        {/* Consultas por WhatsApp */}
+        <div className="pt-2">
+          <a
+            href="https://wa.me/573207105618?text=Hola,%20tengo%20una%20consulta%20sobre%20la%20recepci%C3%B3n%20de%20los%20XV%20A%C3%B1os%20de%20Mar%C3%ADa%20Jos%C3%A9"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 text-xs text-purple-700 hover:text-purple-900 font-medium transition py-1"
+          >
+            <PhoneCall className="w-3.5 h-3.5 text-emerald-600" />
+            <span>¿Tienes dudas? Consultas por WhatsApp</span>
+          </a>
+        </div>
       </div>
     </section>
   );

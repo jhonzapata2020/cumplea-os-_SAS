@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Event, RSVPResult } from '@/types/database';
 import { DEFAULT_MARIA_EVENT } from '@/lib/supabase';
+import { formatEventFullDate } from '@/lib/formatEventDate';
 import { Hero } from './Hero';
 import { Countdown } from './Countdown';
 import { InvitationMessage } from './InvitationMessage';
@@ -33,9 +34,14 @@ export const InvitationPage: React.FC<InvitationPageProps> = ({ event }) => {
     setConfirmedGuestCount(guestCount || 1);
     setSubmitted(true);
     
-    // Desplazar suavemente hacia la vista de éxito de forma segura en cliente
+    // Desplazar suavemente hacia la vista de éxito utilizando el ID del elemento
     if (typeof window !== 'undefined') {
-      window.scrollTo({ top: document.body.scrollHeight / 3, behavior: 'smooth' });
+      setTimeout(() => {
+        const passElement = document.getElementById('success-pass');
+        if (passElement) {
+          passElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
     }
   };
 
@@ -44,22 +50,7 @@ export const InvitationPage: React.FC<InvitationPageProps> = ({ event }) => {
     setRsvpResult(null);
   };
 
-  // Formatear la fecha de forma segura sin riesgo de excepciones
-  let formattedDate = '3 de Octubre de 2026';
-  try {
-    if (safeEvent.event_date) {
-      const eventDateObj = new Date(safeEvent.event_date);
-      if (!isNaN(eventDateObj.getTime())) {
-        formattedDate = eventDateObj.toLocaleDateString('es-ES', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric',
-        });
-      }
-    }
-  } catch {
-    formattedDate = '3 de Octubre de 2026';
-  }
+  const formattedDate = formatEventFullDate(safeEvent.event_date || '2026-10-03T19:30:00-05:00');
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-rose-soft via-white to-lavender-50 text-plum font-body relative selection:bg-lavender-200 selection:text-plum">
