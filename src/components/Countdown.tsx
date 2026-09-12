@@ -13,7 +13,7 @@ interface TimeLeft {
   seconds: number;
 }
 
-export const Countdown: React.FC<CountdownProps> = ({ targetDate }) => {
+export const Countdown: React.FC<CountdownProps> = ({ targetDate = '2026-10-03T19:30:00-05:00' }) => {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({
     days: 0,
     hours: 0,
@@ -24,7 +24,7 @@ export const Countdown: React.FC<CountdownProps> = ({ targetDate }) => {
 
   useEffect(() => {
     setMounted(true);
-    
+
     function calculateTimeLeft(): TimeLeft {
       const target = new Date(targetDate).getTime();
       const now = new Date().getTime();
@@ -62,28 +62,28 @@ export const Countdown: React.FC<CountdownProps> = ({ targetDate }) => {
   const timeBlocks = [
     { label: 'Días', value: timeLeft.days },
     { label: 'Horas', value: timeLeft.hours },
-    { label: 'Min', value: timeLeft.minutes },
-    { label: 'Seg', value: timeLeft.seconds },
+    { label: 'Minutos', value: timeLeft.minutes },
+    { label: 'Segundos', value: timeLeft.seconds },
   ];
 
   return (
     <section className="w-full max-w-md mx-auto my-6 px-4">
       <div className="text-center mb-3">
-        <p className="text-xs uppercase tracking-[0.25em] text-lavender-700 font-medium">
+        <p className="text-xs uppercase tracking-[0.25em] text-purple-800 font-medium">
           Cuenta Regresiva
         </p>
       </div>
 
-      <div className="grid grid-cols-4 gap-2.5 sm:gap-4 p-4 rounded-2xl bg-white/50 backdrop-blur-md border border-white/80 shadow-glass">
+      <div className="grid grid-cols-4 gap-2 sm:gap-3 p-4 rounded-2xl bg-white/70 backdrop-blur-md border border-purple-100 shadow-glass">
         {timeBlocks.map((block, index) => (
           <div
             key={index}
-            className="flex flex-col items-center justify-center p-2 sm:p-3 rounded-xl bg-gradient-to-b from-white/90 to-lavender-50/80 border border-gold/20 shadow-sm"
+            className="flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-xl bg-gradient-to-b from-white to-lavender-50/60 border border-purple-100/80 shadow-xs"
           >
-            <span className="font-heading text-2xl sm:text-3xl font-semibold text-plum tracking-tight">
+            <span className="font-heading text-2xl sm:text-3xl font-semibold text-purple-950 tracking-tight">
               {String(block.value).padStart(2, '0')}
             </span>
-            <span className="text-[10px] sm:text-xs font-light text-plum/70 uppercase tracking-widest mt-0.5">
+            <span className="text-[10px] font-light text-stone-500 uppercase tracking-wider mt-0.5">
               {block.label}
             </span>
           </div>

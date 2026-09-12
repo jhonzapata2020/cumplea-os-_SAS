@@ -100,7 +100,7 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
         </div>
 
         <h3 className="font-heading text-3xl sm:text-4xl text-plum font-normal mb-2">
-          ¡Gracias por confirmar!
+          ¡Gracias por acompañarme!
         </h3>
 
         <p className="text-sm text-plum/80 font-light leading-relaxed mb-4">

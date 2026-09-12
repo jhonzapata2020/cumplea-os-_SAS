@@ -57,7 +57,7 @@ export const InvitationPage: React.FC<InvitationPageProps> = ({ event }) => {
       {/* Marco contenedor centrado para desktop (mobile-first a 390px, max-w-lg en escritorio) */}
       <div className="max-w-lg mx-auto min-h-screen flex flex-col shadow-2xl bg-white/40 backdrop-blur-sm border-x border-white/60">
         
-        {/* 1. Hero: Fotografía de María José + MARÍA JOSÉ + Mis XV Años + Fecha + Botón scroll */}
+        {/* 1. Hero: Fotografía de María José + MARÍA JOSÉ + Mis XV Años + Fecha + Dual CTAs */}
         <Hero
           celebrantName={safeEvent.celebrant_name || 'María José'}
           title={safeEvent.title || 'Mis XV años'}
@@ -65,13 +65,13 @@ export const InvitationPage: React.FC<InvitationPageProps> = ({ event }) => {
           photoUrl="/maria.jpg"
         />
 
-        {/* 2. Cuenta Regresiva */}
-        <Countdown targetDate={safeEvent.event_date || '2026-10-03T19:30:00-05:00'} />
-
-        {/* 3. Mensaje Breve de Invitación ("Con cariño") */}
+        {/* 2. Mensaje Personal & Sentimiento ("Con cariño") */}
         <InvitationMessage />
 
-        {/* 4. Información del Evento ("El gran día", Lluvia de sobres, Dress Code, Google Maps) */}
+        {/* 3. Cuenta Regresiva */}
+        <Countdown targetDate={safeEvent.event_date || '2026-10-03T19:30:00-05:00'} />
+
+        {/* 4. Información del Evento ("El gran día", Dress Code, Google Maps, WhatsApp) */}
         <EventDetails event={safeEvent} />
 
         {/* 5. Formulario de Confirmación O Mensaje de Éxito con Credencial de Pase Digital */}

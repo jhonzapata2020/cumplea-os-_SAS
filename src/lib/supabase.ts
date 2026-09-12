@@ -8,12 +8,12 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 export const DEFAULT_MARIA_EVENT: Event = {
   id: '00000000-0000-0000-0000-000000000001',
   slug: 'maria-jose',
-  title: 'Mis XV años',
+  title: 'Mis XV Años',
   celebrant_name: 'María José',
   event_date: '2026-10-03T19:30:00-05:00',
-  location_name: 'Cholas',
-  location_details: 'Segundo piso',
-  google_maps_url: 'https://www.google.com/maps/search/?api=1&query=Cholas+Neiva',
+  location_name: 'Bar y Restaurante Las Cholas',
+  location_details: 'Dg. 100 #152, Turbo, Antioquia',
+  google_maps_url: 'https://www.google.com/maps/search/?api=1&query=Bar+y+Restaurante+Las+Cholas+Dg+100+152+Turbo+Antioquia',
   created_at: new Date().toISOString(),
 };
 
@@ -30,14 +30,12 @@ export const supabase = isSupabaseConfigured
 
 /**
  * Obtiene los detalles de un evento mediante su slug único estricto.
- * No realiza búsquedas permisivas ni redirecciones silenciosas.
  */
 export async function getEventBySlug(slug: string): Promise<Event | null> {
   const cleanSlug = slug?.toLowerCase().trim();
   if (!cleanSlug) return null;
 
   if (!supabase) {
-    // Solo permitir fallback local en desarrollo o slugs válidos conocidos
     if (cleanSlug === 'maria' || cleanSlug === 'maria-jose') {
       return { ...DEFAULT_MARIA_EVENT, slug: cleanSlug };
     }
@@ -45,7 +43,6 @@ export async function getEventBySlug(slug: string): Promise<Event | null> {
   }
 
   try {
-    // Consulta estricta por slug exacto
     const { data, error } = await supabase
       .from('events')
       .select('*')
@@ -58,7 +55,6 @@ export async function getEventBySlug(slug: string): Promise<Event | null> {
     }
 
     if (!data) {
-      // Fallback exclusivo para slugs principales en desarrollo local si no retorna datos
       if (process.env.NODE_ENV === 'development' && (cleanSlug === 'maria' || cleanSlug === 'maria-jose')) {
         return { ...DEFAULT_MARIA_EVENT, slug: cleanSlug };
       }

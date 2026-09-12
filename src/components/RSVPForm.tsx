@@ -159,7 +159,7 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
               />
             </div>
             <p id="whatsapp-help" className="text-[10px] text-stone-500 mt-1 ml-1 leading-tight">
-              Solo lo usaremos para organizar la recepción y actualizar tu confirmación.
+              Usaremos este número únicamente para organizar la recepción y actualizar tu confirmación.
             </p>
           </div>
 
@@ -237,7 +237,7 @@ export const RSVPForm: React.FC<RSVPFormProps> = ({ eventId, onSuccess }) => {
                 </select>
               </div>
               <p id="guestCount-help" className="text-[10px] text-stone-500 mt-1 ml-1">
-                Total de asistentes, incluyéndote a ti.
+                La cantidad de personas incluye al invitado principal.
               </p>
             </div>
           )}
