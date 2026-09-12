@@ -138,7 +138,7 @@ export const generateReceptionPDF = async (
 
   drawMetricCard(14, cardY, cardW, cardH, 'INVITADOS CONFIRMADOS', confirmedGuests);
   drawMetricCard(14 + (cardW + gap), cardY, cardW, cardH, 'ACOMPAÑANTES CONF.', confirmedCompanions);
-  drawMetricCard(14 + (cardW + gap) * 2, cardY, cardW, cardH, 'TOTAL PERSONAS CONFIRMADAS', totalConfirmedPeople, true);
+  drawMetricCard(14 + (cardW + gap) * 2, cardY, cardW, cardH, 'TOTAL PASES / PERSONAS', totalConfirmedPeople, true);
   drawMetricCard(14 + (cardW + gap) * 3, cardY, cardW, cardH, 'INVITADOS PENDIENTES', pendingGuests);
   drawMetricCard(14 + (cardW + gap) * 4, cardY, cardW, cardH, 'NO ASISTIRÁN', declinedGuests);
 
@@ -164,7 +164,7 @@ export const generateReceptionPDF = async (
 
   autoTable(doc, {
     startY: 64,
-    head: [['#', 'Invitado principal', 'Celular / WhatsApp', 'Acompañantes', 'Total personas', 'Estado']],
+    head: [['#', 'Invitado principal', 'Celular / WhatsApp', 'Acompañantes', 'Pases Asignados', 'Estado']],
     body: tableRows.length > 0 ? tableRows : [['-', 'Sin invitados registrados aún', '-', '-', '-', '-']],
     headStyles: {
       fillColor: [81, 43, 119],
@@ -226,11 +226,11 @@ export const generateReceptionPDF = async (
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
   doc.setTextColor(255, 255, 255);
-  doc.text('TOTAL DE PERSONAS ESPERADAS EN LA FIESTA (Confirmados + Acompañantes):', 20, bannerY + 9);
+  doc.text('TOTAL DE PERSONAS Y PASES ESPERADOS EN LA FIESTA (Titulares + Acompañantes):', 20, bannerY + 9);
 
   doc.setFontSize(13);
   doc.setTextColor(253, 224, 71); // Texto amarillo dorado
-  doc.text(`${totalConfirmedPeople} PERSONAS`, 277, bannerY + 9, { align: 'right' });
+  doc.text(`${totalConfirmedPeople} PASES / PERSONAS`, 277, bannerY + 9, { align: 'right' });
 
   // 7. Pie de Página y Numeración de Páginas en todo el documento
   const pageCount = (doc as any).internal.getNumberOfPages();
