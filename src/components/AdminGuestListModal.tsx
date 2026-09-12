@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { Lock, X, Loader2, AlertCircle, ShieldCheck, Search, Users, CheckCircle, XCircle, MessageSquare, Download, RefreshCw } from 'lucide-react';
 import { AdminGuestItem } from '@/app/api/admin/guests-list/route';
+import { generateReceptionPDF } from '@/lib/pdfGenerator';
 
 interface AdminGuestListModalProps {
   isOpen: boolean;
@@ -122,46 +121,8 @@ export const AdminGuestListModal: React.FC<AdminGuestListModalProps> = ({ isOpen
         return;
       }
 
-      const doc = new jsPDF();
-      doc.setFontSize(18);
-      doc.setTextColor(81, 43, 119);
-      doc.text('Mis XV Años — María José Villegas', 14, 20);
-
-      doc.setFontSize(10);
-      doc.setTextColor(110, 110, 110);
-      doc.text('Lista Oficial de Invitados (Orden Alfabético A-Z) · 3 de Octubre de 2026', 14, 27);
-
-      const pdfGuests = data.guests || [];
-      const tableRows = pdfGuests.map((g: { full_name: string; whatsapp: string }, index: number) => [
-        index + 1,
-        g.full_name,
-        g.whatsapp ? `+${g.whatsapp}` : 'Sin teléfono',
-      ]);
-
-      autoTable(doc, {
-        startY: 33,
-        head: [['#', 'Nombre del Invitado(a)', 'Celular / WhatsApp']],
-        body: tableRows.length > 0 ? tableRows : [['-', 'Sin invitados registrados', '-']],
-        headStyles: {
-          fillColor: [81, 43, 119],
-          textColor: [255, 255, 255],
-          fontStyle: 'bold',
-        },
-        columnStyles: {
-          0: { cellWidth: 15, halign: 'center' },
-          1: { cellWidth: 110 },
-          2: { cellWidth: 55 },
-        },
-        alternateRowStyles: {
-          fillColor: [248, 245, 255],
-        },
-        styles: {
-          fontSize: 9.5,
-          cellPadding: 3.5,
-        },
-      });
-
-      doc.save('Invitados_XV_Maria_Jose.pdf');
+      const doc = await generateReceptionPDF(data.guests || [], data.metrics);
+      doc.save('Reporte_Recepcion_XV_Maria_Jose.pdf');
     } catch {
       alert('Error descargando el PDF.');
     } finally {

@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { Lock, FileText, X, Loader2, AlertCircle, ShieldCheck } from 'lucide-react';
+import { generateReceptionPDF } from '@/lib/pdfGenerator';
 
 interface AdminExportModalProps {
   isOpen: boolean;
@@ -62,53 +61,10 @@ export const AdminExportModal: React.FC<AdminExportModalProps> = ({ isOpen, onCl
         return;
       }
 
-      // Generar PDF usando jsPDF y jspdf-autotable
-      const doc = new jsPDF();
+      // Generar Reporte de Recepción completo en PDF (A4 Landscape)
+      const doc = await generateReceptionPDF(data.guests || [], data.metrics);
 
-      doc.setFontSize(18);
-      doc.setTextColor(81, 43, 119);
-      doc.text('Mis XV Años — María José Villegas', 14, 20);
-
-      doc.setFontSize(10);
-      doc.setTextColor(110, 110, 110);
-      doc.text('Lista Oficial de Invitados (Orden Alfabético A-Z) · 3 de Octubre de 2026', 14, 27);
-
-      const guests = data.guests || [];
-      const tableRows = guests.map((g: { full_name: string; whatsapp: string }, index: number) => [
-        index + 1,
-        g.full_name,
-        g.whatsapp ? `+${g.whatsapp}` : 'Sin teléfono',
-      ]);
-
-      if (tableRows.length === 0) {
-        tableRows.push(['-', 'Sin invitados registrados aún', '-']);
-      }
-
-      autoTable(doc, {
-        startY: 33,
-        head: [['#', 'Nombre del Invitado(a)', 'Celular / WhatsApp']],
-        body: tableRows,
-        headStyles: {
-          fillColor: [81, 43, 119],
-          textColor: [255, 255, 255],
-          fontStyle: 'bold',
-          halign: 'left',
-        },
-        columnStyles: {
-          0: { cellWidth: 15, halign: 'center' },
-          1: { cellWidth: 110 },
-          2: { cellWidth: 55 },
-        },
-        alternateRowStyles: {
-          fillColor: [248, 245, 255],
-        },
-        styles: {
-          fontSize: 9.5,
-          cellPadding: 3.5,
-        },
-      });
-
-      doc.save('Invitados_XV_Maria_Jose.pdf');
+      doc.save('Reporte_Recepcion_XV_Maria_Jose.pdf');
       setPin('');
       onClose();
     } catch {
@@ -149,10 +105,10 @@ export const AdminExportModal: React.FC<AdminExportModalProps> = ({ isOpen, onCl
             <Lock className="w-6 h-6" />
           </div>
           <h3 className="font-heading text-2xl text-plum font-semibold">
-            Lista de Invitados (PDF)
+            Reporte de Recepción (PDF)
           </h3>
           <p className="text-xs text-stone-500 font-light mt-1">
-            Ingresa el PIN de seguridad para descargar la lista oficial en orden A-Z.
+            Ingresa el PIN de seguridad para descargar el reporte completo de recepción.
           </p>
         </div>
 
