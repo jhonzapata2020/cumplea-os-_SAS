@@ -56,14 +56,24 @@ export function formatEventTimeOnly(dateStr: string): string {
 }
 
 /**
- * Genera el enlace directo a Google Calendar
+ * Genera el enlace oficial directo a Google Calendar para agendar el evento
  */
 export function generateGoogleCalendarUrl(event: Event): string {
-  const title = encodeURIComponent(`XV Años de ${event.celebrant_name || 'María José'}`);
-  const details = encodeURIComponent(`Celebración de los XV Años de ${event.celebrant_name || 'María José Villegas'}. ¡Te esperamos!`);
-  const location = encodeURIComponent(`${event.location_name || 'Cholas'}, ${event.location_details || 'Segundo piso'}`);
-  // Fecha UTC: 2026-10-04T00:30:00Z / 2026-10-04T04:30:00Z (Sábado 3 Oct 7:30 PM UTC-5)
-  const dates = '20261004T003000Z/20261004T043000Z';
+  const celebrant = event?.celebrant_name || 'María José Villegas';
+  const locationName = event?.location_name || 'Cholas';
+  const locationDetails = event?.location_details || 'Segundo piso';
+
+  const title = encodeURIComponent(`👑 Mis XV Años — ${celebrant}`);
+  const details = encodeURIComponent(
+    `Acompáñame a celebrar mis 15 años este Sábado 3 de Octubre a las 7:30 p. m. en ${locationName} (${locationDetails}). Por favor confirma tu asistencia en la invitación digital 💜`
+  );
+  const location = encodeURIComponent(`${locationName} (${locationDetails}), Neiva, Huila`);
+  
+  // Sábado 3 de Octubre 2026 19:30 UTC-5 (Colombia) => 2026-10-04T00:30:00Z en UTC
+  // Duración 5 horas (hasta las 00:30 AM del 4 de Octubre UTC-5) => 2026-10-04T05:30:00Z en UTC
+  const startDate = '20261004T003000Z';
+  const endDate = '20261004T053000Z';
+  const dates = `${startDate}/${endDate}`;
 
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${location}`;
 }
@@ -84,7 +94,7 @@ export function downloadICSFile(event: Event): void {
     'DESCRIPTION:Celebración especial de los XV Años de María José. ¡Acompáñanos!',
     `LOCATION:${event.location_name || 'Cholas'}, ${event.location_details || 'Segundo piso'}`,
     'DTSTART:20261004T003000Z',
-    'DTEND:20261004T043000Z',
+    'DTEND:20261004T053000Z',
     'STATUS:CONFIRMED',
     'END:VEVENT',
     'END:VCALENDAR',
