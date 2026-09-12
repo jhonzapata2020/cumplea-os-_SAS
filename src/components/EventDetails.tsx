@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Calendar, Clock, MapPin, ExternalLink, Gift, Shirt, PhoneCall, Info, Download } from 'lucide-react';
+import { Calendar, Clock, MapPin, ExternalLink, Gift, Shirt, PhoneCall, Info } from 'lucide-react';
 import { Event } from '@/types/database';
-import { formatEventDateOnly, formatEventTimeOnly, generateGoogleCalendarUrl, downloadICSFile } from '@/lib/formatEventDate';
+import { formatEventDateOnly, formatEventTimeOnly, generateGoogleCalendarUrl } from '@/lib/formatEventDate';
 
 interface EventDetailsProps {
   event: Event;
@@ -14,6 +14,7 @@ export const EventDetails: React.FC<EventDetailsProps> = ({ event }) => {
   const formattedDateOnly = formatEventDateOnly(event.event_date);
   const formattedTimeOnly = formatEventTimeOnly(event.event_date);
   const googleCalUrl = generateGoogleCalendarUrl(event);
+  const whatsappContactUrl = 'https://wa.me/573135734507?text=%C2%A1Hola!%20Tengo%20una%20consulta%20sobre%20la%20invitaci%C3%B3n%20de%20XV%20a%C3%B1os';
 
   return (
     <section className="w-full max-w-md mx-auto my-8 px-4" id="detalles">
@@ -129,32 +130,23 @@ export const EventDetails: React.FC<EventDetailsProps> = ({ event }) => {
           <ExternalLink className="w-3.5 h-3.5 opacity-80" />
         </a>
 
-        {/* Opciones de Calendario */}
-        <div className="grid grid-cols-2 gap-2">
+        {/* Único Botón Limpio de Agendar en Google Calendar */}
+        <div>
           <a
             href={googleCalUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white border border-purple-200 text-plum font-medium text-xs shadow-xs hover:bg-purple-50 transition cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-2xl bg-white border border-purple-200 text-plum font-medium text-xs shadow-xs hover:bg-purple-50 transition cursor-pointer"
           >
-            <Calendar className="w-3.5 h-3.5 text-purple-600" />
-            <span>Google Calendar</span>
+            <Calendar className="w-4 h-4 text-purple-600" />
+            <span>📅 Agendar en Google Calendar</span>
           </a>
-
-          <button
-            type="button"
-            onClick={() => downloadICSFile(event)}
-            className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white border border-purple-200 text-plum font-medium text-xs shadow-xs hover:bg-purple-50 transition cursor-pointer"
-          >
-            <Download className="w-3.5 h-3.5 text-purple-600" />
-            <span>Descargar .ics</span>
-          </button>
         </div>
 
-        {/* Consultas por WhatsApp */}
-        <div className="pt-2">
+        {/* Consultas por WhatsApp configurado a +57 313 5734507 */}
+        <div className="pt-1">
           <a
-            href="https://wa.me/573207105618?text=Hola,%20tengo%20una%20consulta%20sobre%20la%20recepci%C3%B3n%20de%20los%20XV%20A%C3%B1os%20de%20Mar%C3%ADa%20Jos%C3%A9"
+            href={whatsappContactUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 text-xs text-purple-700 hover:text-purple-900 font-medium transition py-1"
