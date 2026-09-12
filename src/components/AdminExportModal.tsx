@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Lock, FileText, X, Loader2, AlertCircle, ShieldCheck } from 'lucide-react';
@@ -14,6 +14,25 @@ export const AdminExportModal: React.FC<AdminExportModalProps> = ({ isOpen, onCl
   const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Control de tecla Escape y Scroll Lock en document.body
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -46,9 +65,8 @@ export const AdminExportModal: React.FC<AdminExportModalProps> = ({ isOpen, onCl
       // Generar PDF usando jsPDF y jspdf-autotable
       const doc = new jsPDF();
 
-      // Títulos del PDF
       doc.setFontSize(18);
-      doc.setTextColor(81, 43, 119); // #512B77
+      doc.setTextColor(81, 43, 119);
       doc.text('Mis XV Años — María José Villegas', 14, 20);
 
       doc.setFontSize(10);
@@ -71,7 +89,7 @@ export const AdminExportModal: React.FC<AdminExportModalProps> = ({ isOpen, onCl
         head: [['#', 'Nombre del Invitado(a)', 'Celular / WhatsApp']],
         body: tableRows,
         headStyles: {
-          fillColor: [81, 43, 119], // #512B77
+          fillColor: [81, 43, 119],
           textColor: [255, 255, 255],
           fontStyle: 'bold',
           halign: 'left',
@@ -90,7 +108,6 @@ export const AdminExportModal: React.FC<AdminExportModalProps> = ({ isOpen, onCl
         },
       });
 
-      // Descargar PDF como Invitados_XV_Maria_Jose.pdf
       doc.save('Invitados_XV_Maria_Jose.pdf');
       setPin('');
       onClose();
@@ -102,12 +119,26 @@ export const AdminExportModal: React.FC<AdminExportModalProps> = ({ isOpen, onCl
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-plum-dark/60 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-sm p-6 bg-white rounded-3xl shadow-2xl border border-purple-100 text-plum">
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
+    >
+      {/* 1. Backdrop independiente desenfocado con click para cerrar */}
+      <div
+        onClick={onClose}
+        aria-hidden="true"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+      />
+
+      {/* 2. Tarjeta interactiva del Modal */}
+      <div className="relative z-50 w-full max-w-sm p-6 bg-white rounded-3xl shadow-2xl border border-purple-100 text-plum my-auto animate-fade-in">
         {/* Botón de cierre */}
         <button
+          type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-full text-stone-400 hover:text-plum hover:bg-stone-100 transition"
+          aria-label="Cerrar modal"
+          className="absolute top-4 right-4 p-1.5 rounded-full text-stone-400 hover:text-plum hover:bg-stone-100 transition cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>
@@ -144,6 +175,7 @@ export const AdminExportModal: React.FC<AdminExportModalProps> = ({ isOpen, onCl
                 inputMode="numeric"
                 maxLength={4}
                 required
+                autoFocus
                 value={pin}
                 onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
                 placeholder="• • • •"
@@ -156,14 +188,14 @@ export const AdminExportModal: React.FC<AdminExportModalProps> = ({ isOpen, onCl
             <button
               type="button"
               onClick={onClose}
-              className="w-1/3 py-3 rounded-xl border border-stone-200 text-stone-600 text-xs font-medium hover:bg-stone-50 transition"
+              className="w-1/3 py-3 rounded-xl border border-stone-200 text-stone-600 text-xs font-medium hover:bg-stone-50 transition cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="w-2/3 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white font-medium text-xs flex items-center justify-center gap-2 shadow-md transition disabled:opacity-70"
+              className="w-2/3 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white font-medium text-xs flex items-center justify-center gap-2 shadow-md transition disabled:opacity-70 cursor-pointer"
             >
               {loading ? (
                 <>

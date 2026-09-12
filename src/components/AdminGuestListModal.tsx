@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { Lock, FileText, X, Loader2, AlertCircle, ShieldCheck, Search, Users, CheckCircle, XCircle, MessageSquare, Download, RefreshCw } from 'lucide-react';
+import { Lock, X, Loader2, AlertCircle, ShieldCheck, Search, Users, CheckCircle, XCircle, MessageSquare, Download, RefreshCw } from 'lucide-react';
 import { AdminGuestItem } from '@/app/api/admin/guests-list/route';
 
 interface AdminGuestListModalProps {
@@ -30,17 +30,32 @@ export const AdminGuestListModal: React.FC<AdminGuestListModalProps> = ({ isOpen
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'confirmed' | 'declined'>('all');
 
-  // Cargar PIN desde sessionStorage al abrir
+  // Control de tecla Escape y Scroll Lock en document.body
   useEffect(() => {
-    if (isOpen) {
-      const savedPin = sessionStorage.getItem('admin_pin');
-      if (savedPin) {
-        setPin(savedPin);
-        setIsAuthenticated(true);
-        fetchGuestsList(savedPin);
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
       }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = 'hidden';
+
+    // Autocargar si existe un PIN autenticado previo en sessionStorage
+    const savedPin = sessionStorage.getItem('admin_pin');
+    if (savedPin) {
+      setPin(savedPin);
+      setIsAuthenticated(true);
+      fetchGuestsList(savedPin);
     }
-  }, [isOpen]);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onClose]);
 
   const fetchGuestsList = async (currentPin: string) => {
     setLoading(true);
@@ -170,27 +185,37 @@ export const AdminGuestListModal: React.FC<AdminGuestListModalProps> = ({ isOpen
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-plum-dark/70 backdrop-blur-md animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
     >
-      <div className="relative w-full max-w-2xl max-h-[90vh] bg-white rounded-3xl shadow-2xl border border-purple-100 text-plum flex flex-col overflow-hidden">
+      {/* 1. Backdrop independiente desenfocado con click para cerrar */}
+      <div
+        onClick={onClose}
+        aria-hidden="true"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+      />
+
+      {/* 2. Tarjeta interactiva del Modal */}
+      <div className="relative z-50 w-full max-w-lg mx-auto bg-white rounded-3xl shadow-2xl border border-purple-100 text-plum flex flex-col max-h-[90vh] overflow-hidden my-auto animate-fade-in">
         
         {/* Encabezado Modal */}
-        <div className="p-5 sm:p-6 border-b border-purple-100 flex items-center justify-between bg-gradient-to-r from-lavender-50 via-white to-rose-soft/30 shrink-0">
+        <div className="p-4 sm:p-5 border-b border-purple-100 flex items-center justify-between bg-gradient-to-r from-lavender-50 via-white to-rose-soft/30 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center border border-purple-200 shadow-xs">
               <Users className="w-5 h-5 text-purple-700" />
             </div>
             <div>
-              <h3 className="font-heading text-xl sm:text-2xl text-plum font-semibold">
+              <h3 className="font-heading text-lg sm:text-xl text-plum font-semibold leading-tight">
                 Gestión de Invitados
               </h3>
-              <p className="text-xs text-stone-500 font-light">
+              <p className="text-[11px] text-stone-500 font-light">
                 Panel Oficial — XV Años María José
               </p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Cerrar modal"
             className="p-2 rounded-full text-stone-400 hover:text-plum hover:bg-stone-100 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -225,6 +250,7 @@ export const AdminGuestListModal: React.FC<AdminGuestListModalProps> = ({ isOpen
                 inputMode="numeric"
                 maxLength={4}
                 required
+                autoFocus
                 value={pin}
                 onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
                 placeholder="• • • •"
@@ -246,74 +272,82 @@ export const AdminGuestListModal: React.FC<AdminGuestListModalProps> = ({ isOpen
                 )}
               </button>
             </form>
+
+            <div className="pt-2 text-center">
+              <span className="text-[10px] text-stone-400 flex items-center justify-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-purple-600" /> Acceso seguro de anfitrión
+              </span>
+            </div>
           </div>
         ) : (
           /* Dashboard autenticado */
-          <div className="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1">
+          <div className="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
             {/* 1. Tarjetas de Métricas de Aforo */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
-              <div className="p-3 rounded-2xl bg-emerald-50/80 border border-emerald-200/60 text-center">
-                <p className="text-[10px] uppercase font-medium text-emerald-800 tracking-wider">Confirmados</p>
-                <p className="text-2xl font-bold text-emerald-700 font-heading mt-0.5">{metrics.totalConfirmed}</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="p-2.5 rounded-2xl bg-emerald-50/80 border border-emerald-200/60 text-center">
+                <p className="text-[9px] uppercase font-medium text-emerald-800 tracking-wider">Confirmados</p>
+                <p className="text-xl font-bold text-emerald-700 font-heading mt-0.5">{metrics.totalConfirmed}</p>
               </div>
-              <div className="p-3 rounded-2xl bg-purple-50/80 border border-purple-200/60 text-center">
-                <p className="text-[10px] uppercase font-medium text-purple-800 tracking-wider">Total Aforo</p>
-                <p className="text-2xl font-bold text-purple-700 font-heading mt-0.5">{metrics.totalAttendees}</p>
-                <p className="text-[9px] text-purple-600 font-light">Personas esperadas</p>
+              <div className="p-2.5 rounded-2xl bg-purple-50/80 border border-purple-200/60 text-center">
+                <p className="text-[9px] uppercase font-medium text-purple-800 tracking-wider">Total Aforo</p>
+                <p className="text-xl font-bold text-purple-700 font-heading mt-0.5">{metrics.totalAttendees}</p>
               </div>
-              <div className="p-3 rounded-2xl bg-stone-50 border border-stone-200 text-center">
-                <p className="text-[10px] uppercase font-medium text-stone-600 tracking-wider">No Asisten</p>
-                <p className="text-2xl font-bold text-stone-700 font-heading mt-0.5">{metrics.totalDeclined}</p>
+              <div className="p-2.5 rounded-2xl bg-stone-50 border border-stone-200 text-center">
+                <p className="text-[9px] uppercase font-medium text-stone-600 tracking-wider">No Asisten</p>
+                <p className="text-xl font-bold text-stone-700 font-heading mt-0.5">{metrics.totalDeclined}</p>
               </div>
-              <div className="p-3 rounded-2xl bg-rose-50/60 border border-rose-200/60 text-center">
-                <p className="text-[10px] uppercase font-medium text-rose-800 tracking-wider">Mensajes</p>
-                <p className="text-2xl font-bold text-rose-700 font-heading mt-0.5">{metrics.totalMessages}</p>
+              <div className="p-2.5 rounded-2xl bg-rose-50/60 border border-rose-200/60 text-center">
+                <p className="text-[9px] uppercase font-medium text-rose-800 tracking-wider">Mensajes</p>
+                <p className="text-xl font-bold text-rose-700 font-heading mt-0.5">{metrics.totalMessages}</p>
               </div>
             </div>
 
             {/* 2. Barra de búsqueda y Filtros */}
-            <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-              <div className="relative w-full sm:w-64">
-                <Search className="w-4 h-4 text-purple-500 absolute left-3 top-3 pointer-events-none" />
+            <div className="flex flex-col sm:flex-row gap-2.5 items-center justify-between">
+              <div className="relative w-full sm:w-56">
+                <Search className="w-3.5 h-3.5 text-purple-500 absolute left-3 top-2.5 pointer-events-none" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Buscar por nombre o cel..."
-                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-xs text-plum outline-none focus:border-purple-600 focus:bg-white"
+                  className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-plum outline-none focus:border-purple-600 focus:bg-white"
                 />
               </div>
 
               <div className="flex gap-1 bg-stone-100 p-1 rounded-xl w-full sm:w-auto">
                 <button
+                  type="button"
                   onClick={() => setActiveFilter('all')}
-                  className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer ${
+                  className={`flex-1 sm:flex-initial px-2.5 py-1 rounded-lg text-[11px] font-medium transition cursor-pointer ${
                     activeFilter === 'all' ? 'bg-white text-purple-900 shadow-xs' : 'text-stone-600 hover:text-plum'
                   }`}
                 >
                   Todos ({metrics.totalRegistered})
                 </button>
                 <button
+                  type="button"
                   onClick={() => setActiveFilter('confirmed')}
-                  className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer ${
+                  className={`flex-1 sm:flex-initial px-2.5 py-1 rounded-lg text-[11px] font-medium transition cursor-pointer ${
                     activeFilter === 'confirmed' ? 'bg-white text-emerald-800 shadow-xs' : 'text-stone-600 hover:text-plum'
                   }`}
                 >
-                  Confirmados ({metrics.totalConfirmed})
+                  Sí ({metrics.totalConfirmed})
                 </button>
                 <button
+                  type="button"
                   onClick={() => setActiveFilter('declined')}
-                  className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer ${
+                  className={`flex-1 sm:flex-initial px-2.5 py-1 rounded-lg text-[11px] font-medium transition cursor-pointer ${
                     activeFilter === 'declined' ? 'bg-white text-rose-800 shadow-xs' : 'text-stone-600 hover:text-plum'
                   }`}
                 >
-                  No Asisten ({metrics.totalDeclined})
+                  No ({metrics.totalDeclined})
                 </button>
               </div>
             </div>
 
             {/* 3. Lista Responsiva de Invitados */}
-            <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
               {loading ? (
                 <div className="py-8 text-center text-xs text-stone-500 flex items-center justify-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin text-purple-600" />
@@ -327,7 +361,7 @@ export const AdminGuestListModal: React.FC<AdminGuestListModalProps> = ({ isOpen
                 filteredGuests.map((g) => (
                   <div
                     key={g.id}
-                    className="p-3.5 rounded-2xl bg-white border border-stone-200/80 shadow-xs hover:border-purple-200 transition text-left space-y-1.5"
+                    className="p-3 rounded-2xl bg-white border border-stone-200/80 shadow-xs hover:border-purple-200 transition text-left space-y-1"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <h5 className="font-heading font-semibold text-sm text-purple-950">
@@ -355,7 +389,7 @@ export const AdminGuestListModal: React.FC<AdminGuestListModalProps> = ({ isOpen
                     </div>
 
                     {g.message && (
-                      <div className="mt-1.5 p-2 rounded-xl bg-purple-50/60 border border-purple-100 text-[11px] text-purple-900 italic flex items-start gap-1.5">
+                      <div className="mt-1 p-2 rounded-xl bg-purple-50/60 border border-purple-100 text-[11px] text-purple-900 italic flex items-start gap-1.5">
                         <MessageSquare className="w-3.5 h-3.5 text-purple-500 shrink-0 mt-0.5" />
                         <span>&ldquo;{g.message}&rdquo;</span>
                       </div>
@@ -366,8 +400,9 @@ export const AdminGuestListModal: React.FC<AdminGuestListModalProps> = ({ isOpen
             </div>
 
             {/* 4. Acciones de pie de dashboard: Descargar PDF & Actualizar */}
-            <div className="pt-3 border-t border-purple-100 flex flex-col sm:flex-row gap-2.5 items-center justify-between">
+            <div className="pt-3 border-t border-purple-100 flex flex-col sm:flex-row gap-2 items-center justify-between">
               <button
+                type="button"
                 onClick={() => fetchGuestsList(pin)}
                 className="text-xs text-purple-700 hover:text-purple-900 flex items-center gap-1 cursor-pointer font-medium"
               >
@@ -376,9 +411,10 @@ export const AdminGuestListModal: React.FC<AdminGuestListModalProps> = ({ isOpen
               </button>
 
               <button
+                type="button"
                 onClick={handleDownloadPDF}
                 disabled={pdfLoading}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-950 text-white font-medium text-xs flex items-center justify-center gap-2 shadow-sm transition disabled:opacity-50 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2 rounded-xl bg-purple-900 hover:bg-purple-950 text-white font-medium text-xs flex items-center justify-center gap-2 shadow-sm transition disabled:opacity-50 cursor-pointer"
               >
                 {pdfLoading ? (
                   <>
